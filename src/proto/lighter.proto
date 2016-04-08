@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "de.grunicke.lighter";
+
+package LighterGRPC;
+
+service Lighter {
+    rpc setColor(ColorMessage) returns (Confirmation) {};
+    rpc checkConnection(InitMessage) returns (ColorMessage) {};
+    rpc switchState(StateMessage) returns (Confirmation) {};
+}
+
+message ColorMessage {
+    bool onstate = 1;
+    int32 r = 2;
+    int32 g = 3;
+    int32 b = 4;
+    int32 opacity = 5;
+    string sender = 6;
+}
+
+
+message StateMessage{
+    bool onstate = 1;
+    string id = 2;
+}
+
+message Confirmation {
+    bool success = 1;
+}
+
+message InitMessage{
+    string deviceId = 1;
+}
