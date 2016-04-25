@@ -5,8 +5,6 @@ go:
   - 1.6
   - tip
 
-install: get-deps
-
 before_install:
   - ./scripts/installProtobuf.sh
 
