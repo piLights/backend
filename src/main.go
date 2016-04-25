@@ -13,7 +13,10 @@ import (
 )
 
 var (
-	bindTo = flag.String("bindTo", ":13337", "Address and port to listen on, defaults to 0.0.0.0:13337")
+	bindTo   = flag.String("bindTo", ":13337", "Address and port to listen on, defaults to 0.0.0.0:13337")
+	redPin   = flag.Int("red", "18", "Number of the red-pin")
+	greenPin = flag.Int("green", "4", "Number of the green-pin")
+	bluePin  = flag.Int("red", "17", "Number of the blue-pin")
 )
 
 //server implements the server-interface required by GRPC
@@ -49,6 +52,9 @@ func (s *server) SwitchState(ctx context.Context, stateMessage *LighterGRPC.Stat
 
 func main() {
 	flag.Parse()
+
+	//Set the pins
+	dioder.SetPins(*redPin, *greenPin, *bluePin)
 
 	listener, error := net.Listen("tcp", *bindTo)
 	if error != nil {
