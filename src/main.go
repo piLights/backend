@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"flag"
 	"log"
 	"net"
@@ -17,13 +16,7 @@ var (
 	bindTo = flag.String("bindTo", ":13337", "Address and port to listen on, defaults to 0.0.0.0:13337")
 )
 
-/*
-type LighterServer interface {
-	SetColor(context.Context, *ColorMessage) (*Confirmation, error)
-	CheckConnection(context.Context, *InitMessage) (*ColorMessage, error)
-	SwitchState(context.Context, *StateMessage) (*Confirmation, error)
-}
-*/
+//server implements the server-interface required by GRPC
 type server struct{}
 
 func (s *server) SetColor(ctx context.Context, colorMessage *LighterGRPC.ColorMessage) (*LighterGRPC.Confirmation, error) {
@@ -33,7 +26,15 @@ func (s *server) SetColor(ctx context.Context, colorMessage *LighterGRPC.ColorMe
 }
 
 func (s *server) CheckConnection(ctx context.Context, initMessage *LighterGRPC.InitMessage) (*LighterGRPC.ColorMessage, error) {
-	return nil, errors.New("CheckConnection is currently not implemented")
+	colorMap := dioder.GetCurrentColor()
+
+	onstate := true
+
+	if colorMap[0] == 0 && colorMap[1] == 0 && colorMap[2] == 0 {
+		onstate = false
+	}
+
+	return &LighterGRPC.ColorMessage{onstate, int32(colorMap[0]), int32(colorMap[1]), int32(colorMap[2]), 0, "Dioder-Server"}, nil
 }
 
 func (s *server) SwitchState(ctx context.Context, stateMessage *LighterGRPC.StateMessage) (*LighterGRPC.Confirmation, error) {

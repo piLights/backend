@@ -1,0 +1,8 @@
+Build:
+    script:
+        - ./buildscript.sh
+    artifacts:
+        paths:
+            - builds/
+    variables:
+        GOPATH: "/tmp/CIgo"
