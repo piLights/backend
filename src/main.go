@@ -1,6 +1,7 @@
 package main
 
 import (
+	"image/color"
 	"log"
 	"net"
 
@@ -17,28 +18,30 @@ import (
 type server struct{}
 
 func (s *server) SetColor(ctx context.Context, colorMessage *LighterGRPC.ColorMessage) (*LighterGRPC.Confirmation, error) {
-	dioder.SetAll(uint8(colorMessage.R), uint8(colorMessage.G), uint8(colorMessage.B))
+	colorSet := color.RGBA{uint8(colorMessage.R), uint8(colorMessage.G), uint8(colorMessage.B), uint8(colorMessage.Opacity)}
+
+	dioder.SetAll(colorSet)
 
 	return &LighterGRPC.Confirmation{true}, nil
 }
 
 func (s *server) CheckConnection(ctx context.Context, initMessage *LighterGRPC.InitMessage) (*LighterGRPC.ColorMessage, error) {
-	colorMap := dioder.GetCurrentColor()
+	colorSet := dioder.GetCurrentColor()
 
 	onstate := true
 
-	if colorMap[0] == 0 && colorMap[1] == 0 && colorMap[2] == 0 {
+	if colorSet.R == 0 && colorSet.G == 0 && colorSet.B == 0 {
 		onstate = false
 	}
 
-	return &LighterGRPC.ColorMessage{onstate, int32(colorMap[0]), int32(colorMap[1]), int32(colorMap[2]), 0, "Dioder-Server"}, nil
+	return &LighterGRPC.ColorMessage{onstate, int32(colorSet.R), int32(colorSet.G), int32(colorSet.B), int32(colorSet.A), "Dioder-Server"}, nil
 }
 
 func (s *server) SwitchState(ctx context.Context, stateMessage *LighterGRPC.StateMessage) (*LighterGRPC.Confirmation, error) {
 	if stateMessage.Onstate {
-		dioder.SetAll(255, 255, 255)
+		dioder.SetAll(color.RGBA{255, 255, 255, 255})
 	} else {
-		dioder.SetAll(0, 0, 0)
+		dioder.SetAll(color.RGBA{})
 	}
 
 	return &LighterGRPC.Confirmation{true}, nil
