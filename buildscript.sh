@@ -12,5 +12,5 @@ go get
 cd ..
 mkdir builds
 
-go build -o builds/baccy_x86 -v src/*.go
-env GOOS=linux GOARCH=arm go build -o builds/baccy_arm -v src/*.go
+go build -o builds/dioderAPI_x86 -v src/*.go
+env GOOS=linux GOARCH=arm go build -o builds/dioderAPI_arm -v src/*.go
