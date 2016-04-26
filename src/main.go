@@ -10,7 +10,7 @@ import (
 	"github.com/piLights/dioder"
 	"golang.org/x/net/context"
 
-	LighterGRPC "./proto"
+	LighterGRPC "github.com/piLights/dioder-rpc/src/proto"
 	"google.golang.org/grpc"
 )
 
