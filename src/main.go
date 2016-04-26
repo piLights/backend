@@ -16,6 +16,8 @@ import (
 	"google.golang.org/grpc"
 )
 
+const version = "debugVersion"
+
 //server implements the server-interface required by GRPC
 type server struct{}
 
@@ -65,6 +67,7 @@ func (s *server) SwitchState(ctx context.Context, stateMessage *LighterGRPC.Stat
 }
 
 func main() {
+	kingpin.Version(version)
 	kingpin.CommandLine.HelpFlag.Short('h')
 	kingpin.Parse()
 
