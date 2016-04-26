@@ -12,12 +12,23 @@ import (
 //server implements the server-interface required by GRPC
 type server struct{}
 
+func calculateOpacity(colorValue uint8, opacity uint8) (calculatedValue uint8) {
+	calculatedValue = colorValue / 100 * opacity
+
+	return
+}
+
 func (s *server) SetColor(ctx context.Context, colorMessage *LighterGRPC.ColorMessage) (*LighterGRPC.Confirmation, error) {
 	if *debug {
 		log.Println("SetColor:", colorMessage)
 	}
 
-	colorSet := color.RGBA{uint8(colorMessage.R), uint8(colorMessage.G), uint8(colorMessage.B), uint8(colorMessage.Opacity)}
+	opacity := uint8(colorMessage.Opacity)
+	red := calculateOpacity(uint8(colorMessage.R), opacity)
+	green := calculateOpacity(uint8(colorMessage.G), opacity)
+	blue := calculateOpacity(uint8(colorMessage.B), opacity)
+
+	colorSet := color.RGBA{red, green, blue, opacity}
 
 	dioder.SetAll(colorSet)
 
