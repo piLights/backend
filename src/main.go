@@ -1,9 +1,11 @@
 package main
 
 import (
+	"fmt"
 	"image/color"
 	"log"
 	"net"
+	"runtime"
 
 	"gopkg.in/alecthomas/kingpin.v2"
 
@@ -65,6 +67,29 @@ func (s *server) SwitchState(ctx context.Context, stateMessage *LighterGRPC.Stat
 func main() {
 	kingpin.CommandLine.HelpFlag.Short('h')
 	kingpin.Parse()
+
+	//Check, if we should update
+	if *doUpdate {
+		//Build url
+		updateURL := "https://github.com/piLights/dioder-rpc/releases/download/pre-release/dioderAPI_" + runtime.GOOS + "_" + runtime.GOARCH + "_src"
+
+		if *updateFromURL != "" {
+			updateURL = *updateFromURL
+		}
+
+		fmt.Println("Starting update...")
+		if *debug {
+			log.Printf("Downloading from %s\n", updateURL)
+		}
+		error := updateBinary(updateURL)
+		if error != nil {
+			fmt.Println("Updating failed!")
+			log.Fatal(error)
+		}
+
+		fmt.Println("Updated successfully")
+		return
+	}
 
 	//Set the pins
 	if *debug {
