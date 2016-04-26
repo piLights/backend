@@ -12,7 +12,7 @@ before_install:
   - go get github.com/tcnksm/ghr
 
 install:
-    - go get -v ./...
+    - cd src/; go get; cd ..
 
 script:
   - ./buildscript.sh
