@@ -12,6 +12,7 @@ before_install:
   - go get github.com/tcnksm/ghr
   - go get google.golang.org/grpc
   - cd $GOPATH/src/google.golang.org/grpc; git checkout dec33edc378cf4971a2741cfd86ed70a644d6ba3
+  - cd $HOME/gopath/src/github.com/piLights/dioder-rpc
 
 install:
     - cd src/; go get; cd ..
