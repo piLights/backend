@@ -99,9 +99,9 @@ func (s *server) SwitchState(ctx context.Context, stateMessage *LighterGRPC.Stat
 	}
 
 	if stateMessage.Onstate {
-		dioder.SetAll(color.RGBA{255, 255, 255, 100})
+		dioder.TurnOn()
 	} else {
-		dioder.SetAll(color.RGBA{})
+		dioder.TurnOff()
 	}
 
 	return &LighterGRPC.Confirmation{true}, nil
