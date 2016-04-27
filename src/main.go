@@ -76,7 +76,7 @@ func parseConfiguration(configurationFile string) {
 		*redPin, _ = strconv.Atoi(redPinString)
 	}
 
-	greenPinString, ok := file.Get("PinConfiguration", "GreendPin")
+	greenPinString, ok := file.Get("PinConfiguration", "GreenPin")
 	if !ok {
 		if *debug {
 			log.Println("Value GreenPin not set, using default one")
