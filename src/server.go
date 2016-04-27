@@ -38,6 +38,9 @@ func (s *server) SetColor(ctx context.Context, colorMessage *LighterGRPC.ColorMe
 	}
 
 	if *password != "" && *password != colorMessage.Password {
+		if *debug {
+			log.Println("Not authorized")
+		}
 		return nil, errors.New("Not authorized")
 	}
 
@@ -59,6 +62,9 @@ func (s *server) CheckConnection(ctx context.Context, initMessage *LighterGRPC.I
 	}
 
 	if *password != "" && *password != initMessage.Password {
+		if *debug {
+			log.Println("Not authorized")
+		}
 		return nil, errors.New("Not authorized")
 	}
 
@@ -82,6 +88,9 @@ func (s *server) SwitchState(ctx context.Context, stateMessage *LighterGRPC.Stat
 	}
 
 	if *password != "" && *password != stateMessage.Password {
+		if *debug {
+			log.Println("Not authorized")
+		}
 		return nil, errors.New("Not authorized")
 	}
 
