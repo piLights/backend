@@ -64,7 +64,7 @@ func (s *server) CheckConnection(ctx context.Context, initMessage *LighterGRPC.I
 	if *debug {
 		log.Println("CheckConnection: Returning the current settings:", colorSet)
 	}
-	return &LighterGRPC.ColorMessage{onstate, int32(colorSet.R), int32(colorSet.G), int32(colorSet.B), int32(colorSet.A), "Dioder-Server"}, nil
+	return &LighterGRPC.ColorMessage{onstate, int32(colorSet.R), int32(colorSet.G), int32(colorSet.B), int32(colorSet.A), "Dioder-Server", ""}, nil
 }
 
 func (s *server) SwitchState(ctx context.Context, stateMessage *LighterGRPC.StateMessage) (*LighterGRPC.Confirmation, error) {
