@@ -12,4 +12,5 @@ var (
 	updateFromURL     = kingpin.Flag("updateURL", "The URL to fetch the new version from").Default(UPDATEURL).String()
 	configurationFile = kingpin.Flag("configurationFile", "The file to configure").ExistingFile()
 	password          = kingpin.Flag("password", "The password to protect the endpoint").String()
+	cpuProfile        = kingpin.Flag("cpuProfile", "Write the CPU-Profile to a file").String()
 )

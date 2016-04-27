@@ -4,6 +4,8 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"log"
+	"os"
+	"runtime/pprof"
 	"strconv"
 
 	"gopkg.in/alecthomas/kingpin.v2"
@@ -18,6 +20,17 @@ func main() {
 	kingpin.Version(version)
 	kingpin.CommandLine.HelpFlag.Short('h')
 	kingpin.Parse()
+
+	//Only for debugging!
+	if *cpuProfile != "" {
+		file, error := os.Create(*cpuProfile)
+		if error != nil {
+			log.Fatal(error)
+		}
+
+		pprof.StartCPUProfile(file)
+		defer pprof.StopCPUProfile()
+	}
 
 	//Check, if we should update
 	if *doUpdate {
