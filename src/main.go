@@ -1,9 +1,9 @@
 package main
 
 import (
-	"fmt"
+	"crypto/sha256"
+	"encoding/hex"
 	"log"
-	"runtime"
 	"strconv"
 
 	"gopkg.in/alecthomas/kingpin.v2"
@@ -21,29 +21,16 @@ func main() {
 
 	//Check, if we should update
 	if *doUpdate {
-		//Build url
-		updateURL := "https://github.com/piLights/dioder-rpc/releases/download/pre-release/dioderAPI_" + runtime.GOOS + "_" + runtime.GOARCH + "_src"
-
-		if *updateFromURL != "" {
-			updateURL = *updateFromURL
-		}
-
-		fmt.Println("Starting update...")
-		if *debug {
-			log.Printf("Downloading from %s\n", updateURL)
-		}
-		error := updateBinary(updateURL)
-		if error != nil {
-			fmt.Println("Updating failed!")
-			log.Fatal(error)
-		}
-
-		fmt.Println("Updated successfully")
+		startUpdate()
 		return
 	}
 
 	if *configurationFile != "" {
 		parseConfiguration(*configurationFile)
+	}
+
+	if *password != "" {
+		*password = hashPassword(*password)
 	}
 
 	//Set the pins
@@ -53,6 +40,13 @@ func main() {
 	dioder.SetPins(*redPin, *greenPin, *bluePin)
 
 	startServer()
+}
+
+func hashPassword(password string) string {
+	hasher := sha256.New()
+	hasher.Write([]byte(password))
+
+	return hex.EncodeToString(hasher.Sum(nil))
 }
 
 func parseConfiguration(configurationFile string) {
@@ -92,6 +86,15 @@ func parseConfiguration(configurationFile string) {
 		}
 	} else {
 		*bluePin, _ = strconv.Atoi(bluePinString)
+	}
+
+	passwordString, ok := file.Get("General", "Password")
+	if !ok && *debug {
+		if *debug {
+			log.Println("Value Password not set, using none")
+		}
+	} else {
+		*password = passwordString
 	}
 
 }

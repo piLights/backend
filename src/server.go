@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"image/color"
 	"log"
 	"net"
@@ -36,6 +37,10 @@ func (s *server) SetColor(ctx context.Context, colorMessage *LighterGRPC.ColorMe
 		log.Println("SetColor:", colorMessage)
 	}
 
+	if *password != "" && *password != colorMessage.Password {
+		return nil, errors.New("Not authorized")
+	}
+
 	opacity := uint8(colorMessage.Opacity)
 	red := calculateOpacity(uint8(colorMessage.R), opacity)
 	green := calculateOpacity(uint8(colorMessage.G), opacity)
@@ -51,6 +56,10 @@ func (s *server) SetColor(ctx context.Context, colorMessage *LighterGRPC.ColorMe
 func (s *server) CheckConnection(ctx context.Context, initMessage *LighterGRPC.InitMessage) (*LighterGRPC.ColorMessage, error) {
 	if *debug {
 		log.Println("CheckConnection", initMessage)
+	}
+
+	if *password != "" && *password != initMessage.Password {
+		return nil, errors.New("Not authorized")
 	}
 
 	colorSet := dioder.GetCurrentColor()
@@ -70,6 +79,10 @@ func (s *server) CheckConnection(ctx context.Context, initMessage *LighterGRPC.I
 func (s *server) SwitchState(ctx context.Context, stateMessage *LighterGRPC.StateMessage) (*LighterGRPC.Confirmation, error) {
 	if *debug {
 		log.Println("SwitchState", stateMessage)
+	}
+
+	if *password != "" && *password != stateMessage.Password {
+		return nil, errors.New("Not authorized")
 	}
 
 	if stateMessage.Onstate {
