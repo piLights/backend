@@ -15,10 +15,16 @@ import (
 //server implements the server-interface required by GRPC
 type server struct{}
 
-func calculateOpacity(colorValue uint8, opacity uint8) (calculatedValue uint8) {
-	calculatedValue = colorValue / 100 * opacity
+func calculateOpacity(colorValue uint8, opacity uint8) uint8 {
+	var calculatedValue float32
 
-	return
+	calculatedValue = float32(colorValue) / 100 * float32(opacity)
+
+	if *debug {
+		log.Printf("Applying opacity (%d) to color with value %d - Result: %d", opacity, colorValue, uint8(calculatedValue))
+	}
+
+	return uint8(calculatedValue)
 }
 
 func (s *server) SetColor(ctx context.Context, colorMessage *LighterGRPC.ColorMessage) (*LighterGRPC.Confirmation, error) {
