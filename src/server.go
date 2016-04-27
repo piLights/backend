@@ -3,6 +3,9 @@ package main
 import (
 	"image/color"
 	"log"
+	"net"
+
+	"google.golang.org/grpc"
 
 	"github.com/piLights/dioder"
 	"github.com/piLights/dioder-rpc/src/proto"
@@ -66,4 +69,21 @@ func (s *server) SwitchState(ctx context.Context, stateMessage *LighterGRPC.Stat
 	}
 
 	return &LighterGRPC.Confirmation{true}, nil
+}
+
+func startServer() {
+	if *debug {
+		log.Printf("Binding to %s", *bindTo)
+	}
+
+	listener, error := net.Listen("tcp", *bindTo)
+	if error != nil {
+		log.Fatalf("failed to listen: %v", error)
+	}
+
+	grpcServer := grpc.NewServer()
+
+	LighterGRPC.RegisterLighterServer(grpcServer, &server{})
+
+	grpcServer.Serve(listener)
 }

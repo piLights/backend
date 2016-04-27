@@ -3,15 +3,13 @@ package main
 import (
 	"fmt"
 	"log"
-	"net"
 	"runtime"
+	"strconv"
 
 	"gopkg.in/alecthomas/kingpin.v2"
 
 	"github.com/piLights/dioder"
-
-	LighterGRPC "github.com/piLights/dioder-rpc/src/proto"
-	"google.golang.org/grpc"
+	"github.com/vaughan0/go-ini"
 )
 
 const version = "debugVersion"
@@ -44,23 +42,56 @@ func main() {
 		return
 	}
 
+	if *configurationFile != "" {
+		parseConfiguration(*configurationFile)
+	}
+
 	//Set the pins
 	if *debug {
 		log.Printf("Configuring the Pins to: Red: %d, Green: %d, Blue: %d\n", *redPin, *greenPin, *bluePin)
 	}
 	dioder.SetPins(*redPin, *greenPin, *bluePin)
 
+	startServer()
+}
+
+func parseConfiguration(configurationFile string) {
+	//Open the file
+	//Read the values for RGB
+	//Bindto
 	if *debug {
-		log.Printf("Binding to %s", *bindTo)
+		log.Printf("Parsing configurationFile from %s\n", configurationFile)
 	}
-	listener, error := net.Listen("tcp", *bindTo)
+	file, error := ini.LoadFile(configurationFile)
 	if error != nil {
-		log.Fatalf("failed to listen: %v", error)
+		log.Fatal(error)
 	}
 
-	grpcServer := grpc.NewServer()
+	redPinString, ok := file.Get("PinConfiguration", "RedPin")
+	if !ok {
+		if *debug {
+			log.Println("Value RedPin not set, using default one")
+		}
+	} else {
+		*redPin, _ = strconv.Atoi(redPinString)
+	}
 
-	LighterGRPC.RegisterLighterServer(grpcServer, &server{})
+	greenPinString, ok := file.Get("PinConfiguration", "GreendPin")
+	if !ok {
+		if *debug {
+			log.Println("Value GreenPin not set, using default one")
+		}
+	} else {
+		*greenPin, _ = strconv.Atoi(greenPinString)
+	}
 
-	grpcServer.Serve(listener)
+	bluePinString, ok := file.Get("PinConfiguration", "BluePin")
+	if !ok && *debug {
+		if *debug {
+			log.Println("Value BluePin not set, using default one")
+		}
+	} else {
+		*bluePin, _ = strconv.Atoi(bluePinString)
+	}
+
 }
