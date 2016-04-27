@@ -9,19 +9,14 @@ import (
 	"github.com/inconshreveable/go-update"
 )
 
+const UPDATEURL = "https://github.com/piLights/dioder-rpc/releases/download/pre-release/dioderAPI_" + runtime.GOOS + "_" + runtime.GOARCH + "_src"
+
 func startUpdate() {
-	//Build url
-	updateURL := "https://github.com/piLights/dioder-rpc/releases/download/pre-release/dioderAPI_" + runtime.GOOS + "_" + runtime.GOARCH + "_src"
-
-	if *updateFromURL != "" {
-		updateURL = *updateFromURL
-	}
-
 	fmt.Println("Starting update...")
 	if *debug {
-		log.Printf("Downloading from %s\n", updateURL)
+		log.Printf("Downloading from %s\n", *updateFromURL)
 	}
-	error := updateBinary(updateURL)
+	error := updateBinary(*updateFromURL)
 	if error != nil {
 		fmt.Println("Updating failed!")
 		log.Fatal(error)
