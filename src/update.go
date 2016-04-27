@@ -9,8 +9,10 @@ import (
 	"github.com/inconshreveable/go-update"
 )
 
+//UPDATEURL is the URL from which the updates for the OS and architecture are fetched from
 const UPDATEURL = "https://github.com/piLights/dioder-rpc/releases/download/pre-release/dioderAPI_" + runtime.GOOS + "_" + runtime.GOARCH + "_src"
 
+//startUpdate starts the updateProcess
 func startUpdate() {
 	fmt.Println("Starting update...")
 	if *debug {
@@ -25,6 +27,7 @@ func startUpdate() {
 	fmt.Println("Updated successfully")
 }
 
+//updateBinary updates the executable binary
 func updateBinary(url string) error {
 	// request the new file
 	resp, err := http.Get(url)

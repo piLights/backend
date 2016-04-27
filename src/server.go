@@ -16,6 +16,7 @@ import (
 //server implements the server-interface required by GRPC
 type server struct{}
 
+//calculateOpacity calculates the value of colorValue after applying some opacity
 func calculateOpacity(colorValue uint8, opacity uint8) uint8 {
 	var calculatedValue float32
 
@@ -32,6 +33,7 @@ func calculateOpacity(colorValue uint8, opacity uint8) uint8 {
 	return uint8(calculatedValue)
 }
 
+//SetColor sets the color of the Dioder-strips
 func (s *server) SetColor(ctx context.Context, colorMessage *LighterGRPC.ColorMessage) (*LighterGRPC.Confirmation, error) {
 	if *debug {
 		log.Println("SetColor:", colorMessage)
@@ -56,6 +58,7 @@ func (s *server) SetColor(ctx context.Context, colorMessage *LighterGRPC.ColorMe
 	return &LighterGRPC.Confirmation{true}, nil
 }
 
+//CheckConnection checks the connection and returns the current settings
 func (s *server) CheckConnection(ctx context.Context, initMessage *LighterGRPC.InitMessage) (*LighterGRPC.ColorMessage, error) {
 	if *debug {
 		log.Println("CheckConnection", initMessage)
@@ -82,6 +85,7 @@ func (s *server) CheckConnection(ctx context.Context, initMessage *LighterGRPC.I
 	return &LighterGRPC.ColorMessage{onstate, int32(colorSet.R), int32(colorSet.G), int32(colorSet.B), int32(colorSet.A), "Dioder-Server", ""}, nil
 }
 
+//SwitchState switches the state (on/off) of the Didoer-Strips
 func (s *server) SwitchState(ctx context.Context, stateMessage *LighterGRPC.StateMessage) (*LighterGRPC.Confirmation, error) {
 	if *debug {
 		log.Println("SwitchState", stateMessage)
@@ -103,6 +107,7 @@ func (s *server) SwitchState(ctx context.Context, stateMessage *LighterGRPC.Stat
 	return &LighterGRPC.Confirmation{true}, nil
 }
 
+//startServer starts the GRPC-server and binds to the defined address
 func startServer() {
 	if *debug {
 		log.Printf("Binding to %s", *bindTo)

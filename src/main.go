@@ -55,6 +55,7 @@ func main() {
 	startServer()
 }
 
+//hashPassword hashes the defined password with SHA256
 func hashPassword(password string) string {
 	hasher := sha256.New()
 	hasher.Write([]byte(password))
@@ -62,6 +63,7 @@ func hashPassword(password string) string {
 	return hex.EncodeToString(hasher.Sum(nil))
 }
 
+//parseConfiguration parses the configurationFile and sets the specified values
 func parseConfiguration(configurationFile string) {
 	//Open the file
 	//Read the values for RGB
