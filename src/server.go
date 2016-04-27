@@ -18,7 +18,11 @@ type server struct{}
 func calculateOpacity(colorValue uint8, opacity uint8) uint8 {
 	var calculatedValue float32
 
-	calculatedValue = float32(colorValue) / 100 * float32(opacity)
+	if opacity != 100 {
+		calculatedValue = float32(colorValue) / 100 * float32(opacity)
+	} else {
+		calculatedValue = float32(colorValue)
+	}
 
 	if *debug {
 		log.Printf("Applying opacity (%d) to color with value %d - Result: %d", opacity, colorValue, uint8(calculatedValue))
