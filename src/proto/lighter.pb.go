@@ -185,16 +185,10 @@ func _Lighter_SetColor_Handler(srv interface{}, ctx context.Context, dec func(in
 }
 
 func _Lighter_CheckConnection_Handler(srv interface{}, stream grpc.ServerStream) error {
-	fmt.Println(srv)
-
 	m := new(InitMessage)
 	if err := stream.RecvMsg(m); err != nil {
 		return err
 	}
-
-	fmt.Println(m)
-
-	fmt.Println(stream)
 	return srv.(LighterServer).CheckConnection(m, &lighterCheckConnectionServer{stream})
 }
 
