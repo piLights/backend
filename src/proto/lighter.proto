@@ -7,7 +7,7 @@ package LighterGRPC;
 
 service Lighter {
     rpc setColor(ColorMessage) returns (Confirmation) {};
-    rpc checkConnection(InitMessage) returns (ColorMessage) {};
+    rpc checkConnection(InitMessage) returns (stream ColorMessage) {};
     rpc switchState(StateMessage) returns (Confirmation) {};
 }
 
