@@ -17,14 +17,14 @@ message ColorMessage {
     int32 g = 3;
     int32 b = 4;
     int32 opacity = 5;
-    string sender = 6;
+    string deviceID = 6;
     string password = 7;
 }
 
 
-message StateMessage {
+message StateMessage{
     bool onstate = 1;
-    string id = 2;
+    string deviceID = 2;
     string password = 3;
 }
 
@@ -33,6 +33,6 @@ message Confirmation {
 }
 
 message InitMessage {
-    string deviceId = 1;
+    string deviceID = 1;
     string password = 2;
 }
