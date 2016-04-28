@@ -16,6 +16,9 @@ import (
 //server implements the server-interface required by GRPC
 type server struct{}
 
+//Holds all streams
+var streams map[string]LighterGRPC.Lighter_CheckConnectionServer
+
 //calculateOpacity calculates the value of colorValue after applying some opacity
 func calculateOpacity(colorValue uint8, opacity uint8) uint8 {
 	var calculatedValue float32
@@ -55,20 +58,30 @@ func (s *server) SetColor(ctx context.Context, colorMessage *LighterGRPC.ColorMe
 
 	dioder.SetAll(colorSet)
 
+	for deviceID, stream := range streams {
+		if deviceID != colorMessage.DeviceID {
+			if *debug {
+				log.Printf("Sending the colormessage to remote device %s\n", deviceID)
+			}
+
+			stream.Send(colorMessage)
+		}
+	}
+
 	return &LighterGRPC.Confirmation{true}, nil
 }
 
-//CheckConnection checks the connection and returns the current settings
-func (s *server) CheckConnection(ctx context.Context, initMessage *LighterGRPC.InitMessage) (*LighterGRPC.ColorMessage, error) {
+func (s *server) CheckConnection(initMessage *LighterGRPC.InitMessage, stream LighterGRPC.Lighter_CheckConnectionServer) error {
 	if *debug {
 		log.Println("CheckConnection", initMessage)
 	}
 
 	if *password != "" && *password != initMessage.Password {
+		error := errors.New("Not authorized")
 		if *debug {
-			log.Println("Not authorized")
+			log.Println(error)
 		}
-		return nil, errors.New("Not authorized")
+		return error
 	}
 
 	colorSet := dioder.GetCurrentColor()
@@ -81,8 +94,17 @@ func (s *server) CheckConnection(ctx context.Context, initMessage *LighterGRPC.I
 
 	if *debug {
 		log.Println("CheckConnection: Returning the current settings:", colorSet)
+		log.Println("Saving the stream-connection")
 	}
-	return &LighterGRPC.ColorMessage{onstate, int32(colorSet.R), int32(colorSet.G), int32(colorSet.B), int32(colorSet.A), "Dioder-Server", ""}, nil
+
+	streams[initMessage.DeviceID] = stream
+
+	error := stream.Send(&LighterGRPC.ColorMessage{onstate, int32(colorSet.R), int32(colorSet.G), int32(colorSet.B), int32(colorSet.A), "Dioder-Server", ""})
+	if error != nil && *debug {
+		log.Println(error)
+	}
+
+	return error
 }
 
 //SwitchState switches the state (on/off) of the Didoer-Strips
@@ -112,6 +134,9 @@ func startServer() {
 	if *debug {
 		log.Printf("Binding to %s", *bindTo)
 	}
+
+	//Initialize the streams-map
+	streams = make(map[string]LighterGRPC.Lighter_CheckConnectionServer)
 
 	listener, error := net.Listen("tcp", *bindTo)
 	if error != nil {
