@@ -17,7 +17,7 @@ install:
     - cd src/; go get; cd ..
 
 script:
-  - ./buildscript.sh
+  - ./scripts/buildscript.sh
 
 after_success:
     - cd src/; gox -output "../dist/dioderAPI_{{.OS}}_{{.Arch}}_{{.Dir}}" -verbose; cd ..
