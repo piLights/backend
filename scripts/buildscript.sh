@@ -4,7 +4,7 @@ if [ ! -d "/tmp/CIgo" ]; then
   mkdir /tmp/CIgo
 fi
 
-cd src/
+cd ../src/
 
 # Get all dependencies
 go get
