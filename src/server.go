@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"image/color"
 	"log"
 	"net"
@@ -145,6 +146,8 @@ func startServer() {
 	grpcServer := grpc.NewServer()
 
 	LighterGRPC.RegisterLighterServer(grpcServer, &server{})
+
+	fmt.Printf("Listening on %s...\n", *bindTo)
 
 	grpcServer.Serve(listener)
 }
