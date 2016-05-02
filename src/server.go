@@ -8,7 +8,6 @@ import (
 
 	"google.golang.org/grpc"
 
-	"github.com/piLights/dioder"
 	"github.com/piLights/dioder-rpc/src/proto"
 	"golang.org/x/net/context"
 )
@@ -56,7 +55,7 @@ func (s *server) SetColor(ctx context.Context, colorMessage *LighterGRPC.ColorMe
 
 	colorSet := color.RGBA{red, green, blue, opacity}
 
-	dioder.SetAll(colorSet)
+	dioderInstance.SetAll(colorSet)
 
 	for deviceID, stream := range streams {
 		if deviceID != colorMessage.DeviceID {
@@ -84,7 +83,7 @@ func (s *server) CheckConnection(initMessage *LighterGRPC.InitMessage, stream Li
 		return error
 	}
 
-	colorSet := dioder.GetCurrentColor()
+	colorSet := dioderInstance.GetCurrentColor()
 
 	onstate := true
 
@@ -121,9 +120,9 @@ func (s *server) SwitchState(ctx context.Context, stateMessage *LighterGRPC.Stat
 	}
 
 	if stateMessage.Onstate {
-		dioder.TurnOn()
+		dioderInstance.TurnOn()
 	} else {
-		dioder.TurnOff()
+		dioderInstance.TurnOff()
 	}
 
 	return &LighterGRPC.Confirmation{true}, nil

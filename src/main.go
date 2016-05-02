@@ -6,7 +6,6 @@ import (
 	"log"
 	"os"
 	"runtime/pprof"
-	"strconv"
 
 	"gopkg.in/alecthomas/kingpin.v2"
 
@@ -15,6 +14,8 @@ import (
 )
 
 const version = "debugVersion"
+
+var dioderInstance dioder.Dioder
 
 func main() {
 	kingpin.Version(version)
@@ -48,9 +49,10 @@ func main() {
 
 	//Set the pins
 	if *debug {
-		log.Printf("Configuring the Pins to: Red: %d, Green: %d, Blue: %d\n", *redPin, *greenPin, *bluePin)
+		log.Printf("Configuring the Pins to: Red: %s, Green: %s, Blue: %s\n", *redPin, *greenPin, *bluePin)
 	}
-	dioder.SetPins(*redPin, *greenPin, *bluePin)
+
+	dioderInstance = dioder.New(dioder.Pins{*redPin, *greenPin, *bluePin}, *piBlaster)
 
 	startServer()
 }
@@ -82,7 +84,7 @@ func parseConfiguration(configurationFile string) {
 			log.Println("Value RedPin not set, using default one")
 		}
 	} else {
-		*redPin, _ = strconv.Atoi(redPinString)
+		*redPin = redPinString
 	}
 
 	greenPinString, ok := file.Get("PinConfiguration", "GreenPin")
@@ -91,7 +93,7 @@ func parseConfiguration(configurationFile string) {
 			log.Println("Value GreenPin not set, using default one")
 		}
 	} else {
-		*greenPin, _ = strconv.Atoi(greenPinString)
+		*greenPin = greenPinString
 	}
 
 	bluePinString, ok := file.Get("PinConfiguration", "BluePin")
@@ -100,7 +102,7 @@ func parseConfiguration(configurationFile string) {
 			log.Println("Value BluePin not set, using default one")
 		}
 	} else {
-		*bluePin, _ = strconv.Atoi(bluePinString)
+		*bluePin = bluePinString
 	}
 
 	passwordString, ok := file.Get("General", "Password")
