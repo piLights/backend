@@ -1,6 +1,6 @@
 Build:
     script:
-        - ./scripts/buildscript.sh
+        - ./buildscript.sh
     artifacts:
         paths:
             - builds/
