@@ -81,7 +81,7 @@ func parseConfiguration(configurationFile string) {
 	redPinString, ok := file.Get("PinConfiguration", "RedPin")
 	if !ok {
 		if *debug {
-			log.Println("Value RedPin not set, using default one")
+			log.Printf("Value RedPin not set, using default: %s\n", *redPin)
 		}
 	} else {
 		*redPin = redPinString
@@ -90,7 +90,7 @@ func parseConfiguration(configurationFile string) {
 	greenPinString, ok := file.Get("PinConfiguration", "GreenPin")
 	if !ok {
 		if *debug {
-			log.Println("Value GreenPin not set, using default one")
+			log.Printf("Value GreenPin not set, using default %s\n", *greenPin)
 		}
 	} else {
 		*greenPin = greenPinString
@@ -99,7 +99,7 @@ func parseConfiguration(configurationFile string) {
 	bluePinString, ok := file.Get("PinConfiguration", "BluePin")
 	if !ok && *debug {
 		if *debug {
-			log.Println("Value BluePin not set, using default one")
+			log.Printf("Value BluePin not set, using default %s\n", *bluePin)
 		}
 	} else {
 		*bluePin = bluePinString
@@ -112,6 +112,15 @@ func parseConfiguration(configurationFile string) {
 		}
 	} else {
 		*password = passwordString
+	}
+
+	piBlasterLocation, ok := file.Get("General", "PiBlaster")
+	if !ok && *debug {
+		if *debug {
+			log.Printf("Value PiBlaster not set, using default: %s\n", *piBlaster)
+		}
+	} else {
+		*piBlaster = piBlasterLocation
 	}
 
 }
