@@ -19,23 +19,6 @@ type server struct{}
 //Holds all streams
 var streams map[string]LighterGRPC.Lighter_CheckConnectionServer
 
-//calculateOpacity calculates the value of colorValue after applying some opacity
-func calculateOpacity(colorValue uint8, opacity uint8) uint8 {
-	var calculatedValue float32
-
-	if opacity != 100 {
-		calculatedValue = float32(colorValue) / 100 * float32(opacity)
-	} else {
-		calculatedValue = float32(colorValue)
-	}
-
-	if *debug {
-		log.Printf("Applying opacity (%d) to color with value %d - Result: %d", opacity, colorValue, uint8(calculatedValue))
-	}
-
-	return uint8(calculatedValue)
-}
-
 //SetColor sets the color of the Dioder-strips
 func (s *server) SetColor(ctx context.Context, colorMessage *LighterGRPC.ColorMessage) (*LighterGRPC.Confirmation, error) {
 	if *debug {
@@ -50,9 +33,9 @@ func (s *server) SetColor(ctx context.Context, colorMessage *LighterGRPC.ColorMe
 	}
 
 	opacity := uint8(colorMessage.Opacity)
-	red := calculateOpacity(uint8(colorMessage.R), opacity)
-	green := calculateOpacity(uint8(colorMessage.G), opacity)
-	blue := calculateOpacity(uint8(colorMessage.B), opacity)
+	red := uint8(colorMessage.R)
+	green := uint8(colorMessage.G)
+	blue := uint8(colorMessage.B)
 
 	colorSet := color.RGBA{red, green, blue, opacity}
 
