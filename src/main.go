@@ -18,9 +18,9 @@ const version = "debugVersion"
 var dioderInstance dioder.Dioder
 
 func main() {
-	kingpin.Version(version)
+	dioderAPI.Version(version)
 	kingpin.CommandLine.HelpFlag.Short('h')
-	kingpin.Parse()
+	kingpin.MustParse(dioderAPI.Parse(os.Args[1:]))
 
 	//Only for debugging!
 	if *cpuProfile != "" {
