@@ -119,6 +119,6 @@ func parseConfiguration(configurationFile string) {
 	}
 
 	if *piBlaster == "" {
-		*piBlaster = "/dev/piBlaster"
+		*piBlaster = "/dev/pi-blaster"
 	}
 }
