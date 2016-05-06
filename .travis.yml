@@ -1,6 +1,14 @@
 language: go
 sudo: true
 
+env:
+    - OPERATING_SYSTEM=linux
+    - OPERATING_SYSTEM=windows
+    - OPERATING_SYSTEM=openbsd
+    - OPERATING_SYSTEM=freebsd
+    - OPERATING_SYSTEM=netbsd
+    - OPERATING_SYSTEM=darwin
+
 go:
   - 1.6
 
@@ -20,5 +28,5 @@ script:
   - ./buildscript.sh
 
 after_success:
-    - cd src/; gox -output "../dist/dioderAPI_{{.OS}}_{{.Arch}}" -parallel=3 -verbose; cd ..
+    - cd src/; gox -output "../dist/dioderAPI_{{.OS}}_{{.Arch}}" -parallel=3 -verbose -os="${OPERATING_SYSTEM}"; cd ..
     - ghr --username piLights --token $GITHUB_TOKEN --replace --prerelease --debug pre-release dist/
