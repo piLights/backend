@@ -80,47 +80,45 @@ func parseConfiguration(configurationFile string) {
 
 	redPinString, ok := file.Get("PinConfiguration", "RedPin")
 	if !ok {
-		if *debug {
-			log.Printf("Value RedPin not set, using default: %s\n", *redPin)
-		}
+		log.Printf("Value RedPin not set, using default: %s\n", *redPin)
+
 	} else {
 		*redPin = redPinString
 	}
 
 	greenPinString, ok := file.Get("PinConfiguration", "GreenPin")
 	if !ok {
-		if *debug {
-			log.Printf("Value GreenPin not set, using default %s\n", *greenPin)
-		}
+		log.Printf("Value GreenPin not set, using default %s\n", *greenPin)
+
 	} else {
 		*greenPin = greenPinString
 	}
 
 	bluePinString, ok := file.Get("PinConfiguration", "BluePin")
 	if !ok && *debug {
-		if *debug {
-			log.Printf("Value BluePin not set, using default %s\n", *bluePin)
-		}
+		log.Printf("Value BluePin not set, using default %s\n", *bluePin)
+
 	} else {
 		*bluePin = bluePinString
 	}
 
 	passwordString, ok := file.Get("General", "Password")
 	if !ok && *debug {
-		if *debug {
-			log.Println("Value Password not set, using none")
-		}
+		log.Println("Value Password not set, using none")
+
 	} else {
 		*password = passwordString
 	}
 
 	piBlasterLocation, ok := file.Get("General", "PiBlaster")
 	if !ok && *debug {
-		if *debug {
-			log.Printf("Value PiBlaster not set, using default: %s\n", *piBlaster)
-		}
+		log.Printf("Value PiBlaster not set, using default: %s\n", *piBlaster)
+
 	} else {
 		*piBlaster = piBlasterLocation
 	}
 
+	if *piBlaster == "" {
+		*piBlaster = "/dev/piBlaster"
+	}
 }

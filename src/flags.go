@@ -13,5 +13,5 @@ var (
 	configurationFile = kingpin.Flag("configurationFile", "The file to configure").ExistingFile()
 	password          = kingpin.Flag("password", "The password to protect the endpoint").String()
 	cpuProfile        = kingpin.Flag("cpuProfile", "Write the CPU-Profile to a file").String()
-	piBlaster         = kingpin.Flag("piBlaster", "Location of the piBlaster FIFO-file").Default("/dev/pi-blaster").ExistingFile()
+	piBlaster         = kingpin.Flag("piBlaster", "Location of the piBlaster FIFO-file").ExistingFile()
 )
