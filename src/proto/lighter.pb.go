@@ -92,7 +92,7 @@ var _ grpc.ClientConn
 
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the grpc package it is being compiled against.
-const _ = grpc.SupportPackageIsVersion1
+const _ = grpc.SupportPackageIsVersion2
 
 // Client API for Lighter service
 
@@ -172,16 +172,22 @@ func RegisterLighterServer(s *grpc.Server, srv LighterServer) {
 	s.RegisterService(&_Lighter_serviceDesc, srv)
 }
 
-func _Lighter_SetColor_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error) (interface{}, error) {
+func _Lighter_SetColor_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ColorMessage)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
-	out, err := srv.(LighterServer).SetColor(ctx, in)
-	if err != nil {
-		return nil, err
+	if interceptor == nil {
+		return srv.(LighterServer).SetColor(ctx, in)
 	}
-	return out, nil
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/LighterGRPC.Lighter/SetColor",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LighterServer).SetColor(ctx, req.(*ColorMessage))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _Lighter_CheckConnection_Handler(srv interface{}, stream grpc.ServerStream) error {
@@ -205,16 +211,22 @@ func (x *lighterCheckConnectionServer) Send(m *ColorMessage) error {
 	return x.ServerStream.SendMsg(m)
 }
 
-func _Lighter_SwitchState_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error) (interface{}, error) {
+func _Lighter_SwitchState_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(StateMessage)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
-	out, err := srv.(LighterServer).SwitchState(ctx, in)
-	if err != nil {
-		return nil, err
+	if interceptor == nil {
+		return srv.(LighterServer).SwitchState(ctx, in)
 	}
-	return out, nil
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/LighterGRPC.Lighter/SwitchState",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LighterServer).SwitchState(ctx, req.(*StateMessage))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 var _Lighter_serviceDesc = grpc.ServiceDesc{
