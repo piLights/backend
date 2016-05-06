@@ -28,5 +28,5 @@ script:
   - ./buildscript.sh
 
 after_success:
-    - cd src/; gox -output "../dist/dioderAPI_{{.OS}}_{{.Arch}}" -parallel=3 -verbose -os="${OPERATING_SYSTEM}"; cd ..
+    - cd src/; gox -output "../dist/dioderAPI_{{.OS}}_{{.Arch}}" -parallel=2 -verbose -os="${OPERATING_SYSTEM}"; cd ..
     - ghr --username piLights --token $GITHUB_TOKEN --replace --prerelease --debug pre-release dist/
