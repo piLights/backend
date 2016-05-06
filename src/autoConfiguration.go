@@ -4,15 +4,17 @@ import (
 	"encoding/json"
 	"log"
 	"net"
+	"strconv"
 )
 
 type configurationRequest struct {
-	DeviceID string
+	DeviceID     string
+	CallbackPort int
 }
 
 type configuration struct {
 	IPAddress net.IP
-	Port      int
+	Port      string
 	Version   string
 }
 
@@ -27,8 +29,13 @@ func startAutoConfigurationServer() {
 		Port: 13338,
 	})
 	if error != nil {
-		log.Fatalf("Failed to start the background-configuration server on %s, port %d\n", net.IPv4zero.String(), 13338)
+		if *debug {
+			log.Printf("Failed to start the background-configuration server on %s, port %d\n", net.IPv4zero.String(), 13338)
+		}
+		log.Fatal(error)
 	}
+
+	defer socket.Close()
 
 	for {
 		listen(socket)
@@ -48,4 +55,38 @@ func listen(socket *net.UDPConn) {
 	if error != nil {
 		log.Fatal(error)
 	}
+
+	remoteAddressHostPort := remoteAddr.String() + strconv.Itoa(request.CallbackPort)
+	connection, error := net.Dial("tcp", remoteAddressHostPort)
+	if error != nil {
+		if *debug {
+			log.Printf("Could not connect to %s to send the configuration.\n", remoteAddressHostPort)
+		}
+
+		log.Println(error)
+	}
+
+	defer connection.Close()
+
+	host, port, error := net.SplitHostPort(*bindTo)
+	if error != nil {
+		if *debug {
+			log.Printf("Could not split host and port: %s", *bindTo)
+		}
+		log.Fatal(error)
+	}
+	clientConfiguration := configuration{
+		net.ParseIP(host),
+		port,
+		version,
+	}
+
+	//Build the request
+	message, error := json.Marshal(clientConfiguration)
+	if error != nil {
+		log.Fatal(error)
+	}
+
+	connection.Write([]byte(message))
+
 }
