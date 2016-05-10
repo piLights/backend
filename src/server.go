@@ -19,6 +19,8 @@ type server struct{}
 //Holds all streams
 var streams map[string]LighterGRPC.Lighter_CheckConnectionServer
 
+var onState bool
+
 //SetColor sets the color of the Dioder-strips
 func (s *server) SetColor(ctx context.Context, colorMessage *LighterGRPC.ColorMessage) (*LighterGRPC.Confirmation, error) {
 	if *debug {
@@ -69,12 +71,6 @@ func (s *server) CheckConnection(initMessage *LighterGRPC.InitMessage, stream Li
 
 	colorSet := dioderInstance.GetCurrentColor()
 
-	onstate := true
-
-	if colorSet.R == 0 && colorSet.G == 0 && colorSet.B == 0 {
-		onstate = false
-	}
-
 	if *debug {
 		log.Println("CheckConnection: Returning the current settings:", colorSet)
 		log.Println("Saving the stream-connection")
@@ -82,7 +78,7 @@ func (s *server) CheckConnection(initMessage *LighterGRPC.InitMessage, stream Li
 
 	streams[initMessage.DeviceID] = stream
 
-	error := stream.Send(&LighterGRPC.ColorMessage{onstate, int32(colorSet.R), int32(colorSet.G), int32(colorSet.B), int32(colorSet.A), "Dioder-Server", ""})
+	error := stream.Send(&LighterGRPC.ColorMessage{onState, int32(colorSet.R), int32(colorSet.G), int32(colorSet.B), int32(colorSet.A), "Dioder-Server", ""})
 	if error != nil && *debug {
 		log.Println(error)
 	}
@@ -108,7 +104,9 @@ func (s *server) SwitchState(ctx context.Context, stateMessage *LighterGRPC.Stat
 	} else {
 		dioderInstance.TurnOff()
 	}
-
+	
+	onState = stateMessage.Onstate
+	
 	return &LighterGRPC.Confirmation{true}, nil
 }
 
