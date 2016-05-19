@@ -130,4 +130,8 @@ func parseConfiguration(configurationFile string) {
 	} else {
 		*serverName = configServerName
 	}
+
+	if *serverName == "" {
+		*serverName = "Dioder Server"
+	}
 }
