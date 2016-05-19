@@ -1,22 +1,11 @@
 package main
 
 import (
-	"encoding/json"
 	"log"
 	"net"
-	"strconv"
+
+	"github.com/davecheney/mdns"
 )
-
-type configurationRequest struct {
-	DeviceID     string
-	CallbackPort int
-}
-
-type configuration struct {
-	IPAddress net.IP
-	Port      string
-	Version   string
-}
 
 //startServer starts the GRPC-server and binds to the defined address
 func startAutoConfigurationServer() {
@@ -24,69 +13,52 @@ func startAutoConfigurationServer() {
 		log.Printf("Binding to %s\n", *bindTo)
 	}
 
-	socket, error := net.ListenUDP("udp", &net.UDPAddr{
-		IP:   net.IPv4zero,
-		Port: 13338,
-	})
-	if error != nil {
-		if *debug {
-			log.Printf("Failed to start the background-configuration server on %s, port %d\n", net.IPv4zero.String(), 13338)
-		}
-		log.Fatal(error)
-	}
-
-	defer socket.Close()
-
-	for {
-		listen(socket)
-	}
-}
-
-func listen(socket *net.UDPConn) {
-	data := make([]byte, 4096)
-	length, remoteAddr, error := socket.ReadFromUDP(data)
-	if error != nil {
-		log.Fatal(error)
-	}
-
-	//@ToDO: Check, if the user wants the file
-	var request configurationRequest
-	error = json.Unmarshal(data[:length], &request)
-	if error != nil {
-		log.Fatal(error)
-	}
-
-	remoteAddressHostPort := remoteAddr.String() + strconv.Itoa(request.CallbackPort)
-	connection, error := net.Dial("tcp", remoteAddressHostPort)
-	if error != nil {
-		if *debug {
-			log.Printf("Could not connect to %s to send the configuration.\n", remoteAddressHostPort)
-		}
-
-		log.Println(error)
-	}
-
-	defer connection.Close()
+	publishRecord(`_dioder._tcp.local. 60 IN TXT "` + *serverName + `"`)
 
 	host, port, error := net.SplitHostPort(*bindTo)
 	if error != nil {
-		if *debug {
-			log.Printf("Could not split host and port: %s", *bindTo)
+		log.Fatal(error)
+	}
+
+	if host != "" {
+		createSRVRecord(host, port)
+	} else {
+		//If no host is found, create an SRV-record for every IP on this machine
+		addressList, error := net.InterfaceAddrs()
+		if error != nil {
+			log.Fatal(error)
 		}
-		log.Fatal(error)
+
+		for _, address := range addressList {
+			ipnet, ok := address.(*net.IPNet)
+			if ok && !ipnet.IP.IsLoopback() {
+				if ipnet.IP.To4() != nil {
+					ipAddress, _, error := net.ParseCIDR(address.String())
+					if error != nil {
+						log.Fatal(error)
+					}
+
+					createSRVRecord(ipAddress.String(), port)
+				}
+			}
+		}
 	}
-	clientConfiguration := configuration{
-		net.ParseIP(host),
-		port,
-		version,
+}
+
+//createSRVRecord creates an SRV record announcing the service on the given host:port
+func createSRVRecord(host, port string) {
+	var srvRecord = "_dioder._tcp.local. 60 IN SRV 0 0 " + port + " " + host
+	publishRecord(srvRecord)
+}
+
+//publishRecord publishes an record
+func publishRecord(resourceRecord string) {
+	if *debug {
+		log.Printf("Setting resourceRecord: %s", resourceRecord)
 	}
 
-	//Build the request
-	message, error := json.Marshal(clientConfiguration)
+	error := mdns.Publish(resourceRecord)
 	if error != nil {
-		log.Fatal(error)
+		log.Fatalf(`Unable to publish record "%s": %v`, resourceRecord, error)
 	}
-
-	connection.Write([]byte(message))
-
 }

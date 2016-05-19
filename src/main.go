@@ -52,6 +52,8 @@ func main() {
 		log.Printf("Configuring the Pins to: Red: %s, Green: %s, Blue: %s\n", *redPin, *greenPin, *bluePin)
 	}
 
+	go startAutoConfigurationServer()
+
 	dioderInstance = dioder.New(dioder.Pins{*redPin, *greenPin, *bluePin}, *piBlaster)
 
 	startServer()
@@ -120,5 +122,12 @@ func parseConfiguration(configurationFile string) {
 
 	if *piBlaster == "" {
 		*piBlaster = "/dev/pi-blaster"
+	}
+
+	configServerName, ok := file.Get("General", "ServerName")
+	if !ok && *debug {
+		log.Printf("Value ServerName not set, using default: %s\n", *piBlaster)
+	} else {
+		*serverName = configServerName
 	}
 }

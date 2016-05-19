@@ -16,4 +16,5 @@ var (
 	password          = dioderAPI.Flag("password", "The password to protect the endpoint").String()
 	cpuProfile        = dioderAPI.Flag("cpuProfile", "Write the CPU-Profile to a file").String()
 	piBlaster         = dioderAPI.Flag("piBlaster", "Location of the piBlaster FIFO-file").ExistingFile()
+	serverName        = dioderAPI.Flag("serverName", "The name of the server").Default("Dioder Server").String()
 )
