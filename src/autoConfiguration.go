@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net"
 
@@ -10,7 +11,7 @@ import (
 //startServer starts the GRPC-server and binds to the defined address
 func startAutoConfigurationServer() {
 	if *debug {
-		log.Printf("Binding to %s\n", *bindTo)
+		logChan <- fmt.Sprintf("Binding to %s", *bindTo)
 	}
 
 	publishRecord(`_dioder._tcp.local. 60 IN TXT "` + *serverName + `"`)
@@ -54,7 +55,7 @@ func createSRVRecord(host, port string) {
 //publishRecord publishes an record
 func publishRecord(resourceRecord string) {
 	if *debug {
-		log.Printf("Setting resourceRecord: %s", resourceRecord)
+		logChan <- fmt.Sprintf("Setting resourceRecord: %s", resourceRecord)
 	}
 
 	error := mdns.Publish(resourceRecord)

@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"image/color"
-	"log"
 	"net"
 
 	"google.golang.org/grpc"
@@ -24,12 +23,12 @@ var onState bool
 //SetColor sets the color of the Dioder-strips
 func (s *server) SetColor(ctx context.Context, colorMessage *LighterGRPC.ColorMessage) (*LighterGRPC.Confirmation, error) {
 	if *debug {
-		log.Println("SetColor:", colorMessage)
+		logChan <- fmt.Sprint("SetColor:", colorMessage)
 	}
 
 	if *password != "" && *password != colorMessage.Password {
 		if *debug {
-			log.Println("Not authorized")
+			logChan <- "Not authorized"
 		}
 		return nil, errors.New("Not authorized")
 	}
@@ -46,7 +45,7 @@ func (s *server) SetColor(ctx context.Context, colorMessage *LighterGRPC.ColorMe
 	for deviceID, stream := range streams {
 		if deviceID != colorMessage.DeviceID {
 			if *debug {
-				log.Printf("Sending the colormessage to remote device %s\n", deviceID)
+				logChan <- fmt.Sprintf("Sending the colormessage to remote device %s\n", deviceID)
 			}
 
 			stream.Send(colorMessage)
@@ -58,13 +57,13 @@ func (s *server) SetColor(ctx context.Context, colorMessage *LighterGRPC.ColorMe
 
 func (s *server) CheckConnection(initMessage *LighterGRPC.InitMessage, stream LighterGRPC.Lighter_CheckConnectionServer) error {
 	if *debug {
-		log.Println("CheckConnection", initMessage)
+		logChan <- fmt.Sprint("CheckConnection", initMessage)
 	}
 
 	if *password != "" && *password != initMessage.Password {
 		error := errors.New("Not authorized")
 		if *debug {
-			log.Println(error)
+			logChan <- error
 		}
 		return error
 	}
@@ -72,15 +71,15 @@ func (s *server) CheckConnection(initMessage *LighterGRPC.InitMessage, stream Li
 	colorSet := dioderInstance.GetCurrentColor()
 
 	if *debug {
-		log.Println("CheckConnection: Returning the current settings:", colorSet)
-		log.Println("Saving the stream-connection")
+		logChan <- fmt.Sprint("CheckConnection: Returning the current settings:", colorSet)
+		logChan <- "Saving the stream-connection"
 	}
 
 	streams[initMessage.DeviceID] = stream
 
 	error := stream.Send(&LighterGRPC.ColorMessage{onState, int32(colorSet.R), int32(colorSet.G), int32(colorSet.B), int32(colorSet.A), "Dioder-Server", ""})
 	if error != nil && *debug {
-		log.Println(error)
+		logChan <- error
 	}
 
 	return error
@@ -89,12 +88,12 @@ func (s *server) CheckConnection(initMessage *LighterGRPC.InitMessage, stream Li
 //SwitchState switches the state (on/off) of the Didoer-Strips
 func (s *server) SwitchState(ctx context.Context, stateMessage *LighterGRPC.StateMessage) (*LighterGRPC.Confirmation, error) {
 	if *debug {
-		log.Println("SwitchState", stateMessage)
+		logChan <- fmt.Sprintln("SwitchState", stateMessage)
 	}
 
 	if *password != "" && *password != stateMessage.Password {
 		if *debug {
-			log.Println("Not authorized")
+			logChan <- "Not authorized"
 		}
 		return nil, errors.New("Not authorized")
 	}
@@ -104,16 +103,16 @@ func (s *server) SwitchState(ctx context.Context, stateMessage *LighterGRPC.Stat
 	} else {
 		dioderInstance.TurnOff()
 	}
-	
+
 	onState = stateMessage.Onstate
-	
+
 	return &LighterGRPC.Confirmation{true}, nil
 }
 
 //startServer starts the GRPC-server and binds to the defined address
 func startServer() {
 	if *debug {
-		log.Printf("Binding to %s", *bindTo)
+		logChan <- fmt.Sprintf("Binding to %s", *bindTo)
 	}
 
 	//Initialize the streams-map
@@ -121,7 +120,7 @@ func startServer() {
 
 	listener, error := net.Listen("tcp", *bindTo)
 	if error != nil {
-		log.Fatalf("failed to listen: %v", error)
+		logChan <- fmt.Sprintf("failed to listen: %v", error)
 	}
 
 	grpcServer := grpc.NewServer()

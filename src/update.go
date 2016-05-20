@@ -16,7 +16,7 @@ const UPDATEURL = "https://github.com/piLights/dioder-rpc/releases/download/pre-
 func startUpdate() {
 	fmt.Println("Starting update...")
 	if *debug {
-		log.Printf("Downloading from %s\n", *updateFromURL)
+		logChan <- fmt.Sprintf("Downloading from %s\n", *updateFromURL)
 	}
 	error := updateBinary(*updateFromURL)
 	if error != nil {

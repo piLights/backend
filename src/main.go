@@ -3,6 +3,7 @@ package main
 import (
 	"crypto/sha256"
 	"encoding/hex"
+	"fmt"
 	"log"
 	"os"
 	"runtime/pprof"
@@ -15,12 +16,20 @@ import (
 
 const version = "debugVersion"
 
-var dioderInstance dioder.Dioder
+var (
+	dioderInstance dioder.Dioder
+	logChan        chan interface{}
+	fatalChan      chan interface{}
+)
 
 func main() {
 	dioderAPI.Version(version)
 	kingpin.CommandLine.HelpFlag.Short('h')
 	kingpin.MustParse(dioderAPI.Parse(os.Args[1:]))
+
+	logChan = make(chan interface{}, 100)
+	fatalChan = make(chan interface{}, 100)
+	go loggingService(logChan, fatalChan)
 
 	//Only for debugging!
 	if *cpuProfile != "" {
@@ -49,7 +58,7 @@ func main() {
 
 	//Set the pins
 	if *debug {
-		log.Printf("Configuring the Pins to: Red: %s, Green: %s, Blue: %s\n", *redPin, *greenPin, *bluePin)
+		logChan <- fmt.Sprintf("Configuring the Pins to: Red: %s, Green: %s, Blue: %s", *redPin, *greenPin, *bluePin)
 	}
 
 	go startAutoConfigurationServer()
@@ -73,7 +82,7 @@ func parseConfiguration(configurationFile string) {
 	//Read the values for RGB
 	//Bindto
 	if *debug {
-		log.Printf("Parsing configurationFile from %s\n", configurationFile)
+		logChan <- fmt.Sprintf("Parsing configurationFile from %s", configurationFile)
 	}
 	file, error := ini.LoadFile(configurationFile)
 	if error != nil {
@@ -82,40 +91,35 @@ func parseConfiguration(configurationFile string) {
 
 	redPinString, ok := file.Get("PinConfiguration", "RedPin")
 	if !ok {
-		log.Printf("Value RedPin not set, using default: %s\n", *redPin)
-
+		logChan <- fmt.Sprintf("Value RedPin not set, using default: %s", *redPin)
 	} else {
 		*redPin = redPinString
 	}
 
 	greenPinString, ok := file.Get("PinConfiguration", "GreenPin")
 	if !ok {
-		log.Printf("Value GreenPin not set, using default %s\n", *greenPin)
-
+		logChan <- fmt.Sprintf("Value GreenPin not set, using default %s", *greenPin)
 	} else {
 		*greenPin = greenPinString
 	}
 
 	bluePinString, ok := file.Get("PinConfiguration", "BluePin")
 	if !ok && *debug {
-		log.Printf("Value BluePin not set, using default %s\n", *bluePin)
-
+		logChan <- fmt.Sprintf("Value BluePin not set, using default %s", *bluePin)
 	} else {
 		*bluePin = bluePinString
 	}
 
 	passwordString, ok := file.Get("General", "Password")
 	if !ok && *debug {
-		log.Println("Value Password not set, using none")
-
+		logChan <- fmt.Sprintf("Value Password not set, using none")
 	} else {
 		*password = passwordString
 	}
 
 	piBlasterLocation, ok := file.Get("General", "PiBlaster")
 	if !ok && *debug {
-		log.Printf("Value PiBlaster not set, using default: %s\n", *piBlaster)
-
+		logChan <- fmt.Sprintf("Value PiBlaster not set, using default: %s", *piBlaster)
 	} else {
 		*piBlaster = piBlasterLocation
 	}
@@ -126,7 +130,7 @@ func parseConfiguration(configurationFile string) {
 
 	configServerName, ok := file.Get("General", "ServerName")
 	if !ok && *debug {
-		log.Printf("Value ServerName not set, using default: %s\n", *piBlaster)
+		logChan <- fmt.Sprintf("Value ServerName not set, using default: %s", *piBlaster)
 	} else {
 		*serverName = configServerName
 	}
