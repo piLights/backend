@@ -32,7 +32,7 @@ func startAutoConfigurationServer() {
 		for _, address := range addressList {
 			ipnet, ok := address.(*net.IPNet)
 			if ok && !ipnet.IP.IsLoopback() {
-				if ipnet.IP.To4() != nil {
+				if ipnet.IP.String() != "" {
 					ipAddress, _, error := net.ParseCIDR(address.String())
 					if error != nil {
 						log.Fatal(error)
