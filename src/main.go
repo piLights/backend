@@ -63,7 +63,7 @@ func main() {
 
 	go startAutoConfigurationServer()
 
-	dioderInstance = dioder.New(dioder.Pins{*redPin, *greenPin, *bluePin}, *piBlaster)
+	dioderInstance = dioder.New(dioder.Pins{Red: *redPin, Green: *greenPin, Blue: *bluePin}, *piBlaster)
 
 	startServer()
 }
