@@ -22,7 +22,7 @@ message ColorMessage {
 }
 
 
-message StateMessage{
+message StateMessage {
     bool onstate = 1;
     string deviceID = 2;
     string password = 3;
