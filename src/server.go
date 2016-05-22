@@ -105,7 +105,7 @@ func (s *server) CheckConnection(initMessage *LighterGRPC.InitMessage, stream Li
 			}
 		} else {
 			error := stream.Send(colorMessage)
-			if *debug {
+			if error != nil && *debug {
 				logChan <- error
 			}
 
