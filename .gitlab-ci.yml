@@ -1,8 +1,55 @@
-Build:
+image: electrotumbao/golang-protoc
+
+Linux:
     script:
-        - ./buildscript.sh
+        - "./scripts/build.sh"
+    variables:
+        OPERATING_SYSTEM: "linux"
     artifacts:
         paths:
-            - builds/
+            - dist/
+
+Windows:
+    script:
+        - "./scripts/build.sh"
     variables:
-        GOPATH: "/tmp/CIgo"
+        OPERATING_SYSTEM: "windows"
+    artifacts:
+        paths:
+            - dist/
+
+OpenBSD:
+    script:
+        - "./scripts/build.sh"
+    variables:
+        OPERATING_SYSTEM: "openbsd"
+    artifacts:
+        paths:
+            - dist/
+
+FreeBSD:
+    script:
+        - "./scripts/build.sh"
+    variables:
+        OPERATING_SYSTEM: "freebsd"
+    artifacts:
+        paths:
+            - dist/
+
+NetBSD:
+    script:
+        - "./scripts/build.sh"
+    variables:
+        OPERATING_SYSTEM: "netbsd"
+    artifacts:
+        paths:
+            - dist/
+
+Darwin:
+    script:
+        - "./scripts/build.sh"
+    variables:
+        OPERATING_SYSTEM: "darwin"
+    artifacts:
+        paths:
+            - dist/
