@@ -118,7 +118,25 @@ func startServer() {
 	//Initialize the streams-map
 	streams = make(map[string]LighterGRPC.Lighter_CheckConnectionServer)
 
-	listener, error := net.Listen("tcp", *bindTo)
+	protocol := "tcp"
+
+	if *ipv4only {
+		if *debug {
+			logChan <- "Forced to listen on IPv4 only."
+		}
+
+		protocol = "tcp4"
+	}
+
+	if *ipv6only {
+		if *debug {
+			logChan <- "Forced to listen on IPv6 only."
+		}
+
+		protocol = "tcp6"
+	}
+
+	listener, error := net.Listen(protocol, *bindTo)
 	if error != nil {
 		logChan <- fmt.Sprintf("failed to listen: %v", error)
 	}
