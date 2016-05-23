@@ -17,4 +17,6 @@ var (
 	cpuProfile        = dioderAPI.Flag("cpuProfile", "Write the CPU-Profile to a file").String()
 	piBlaster         = dioderAPI.Flag("piBlaster", "Location of the piBlaster FIFO-file").ExistingFile()
 	serverName        = dioderAPI.Flag("serverName", "The name of the server").Default("Dioder Server").String()
+	ipv4only          = dioderAPI.Flag("4", "Forces dioderAPI to use IPv4 addresses only.").Short('4').Bool()
+	ipv6only          = dioderAPI.Flag("6", "Forces dioderAPI to use IPv4 addresses only.").Short('6').Bool()
 )
