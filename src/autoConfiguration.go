@@ -34,6 +34,16 @@ func startAutoConfigurationServer() {
 			ipnet, ok := address.(*net.IPNet)
 			if ok && !ipnet.IP.IsLoopback() {
 				if ipnet.IP.String() != "" {
+					// Do not publish IPv4 records if IPv4 is disabled
+					if *ipv4only && ipnet.IP.To4() == nil {
+						continue
+					}
+
+					// Do not publish IPv6 records if IPv6 is disabled
+					if *ipv6only && ipnet.IP.To4() != nil {
+						continue
+					}
+
 					ipAddress, _, error := net.ParseCIDR(address.String())
 					if error != nil {
 						log.Fatal(error)
