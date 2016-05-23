@@ -2,7 +2,7 @@ image: electrotumbao/golang-protoc
 
 Linux:
     script:
-        - "./scripts/build.sh"
+        - "/bin/bash ./scripts/build.sh"
     variables:
         OPERATING_SYSTEM: "linux"
     artifacts:
@@ -11,7 +11,7 @@ Linux:
 
 Windows:
     script:
-        - "./scripts/build.sh"
+        - "/bin/bash ./scripts/build.sh"
     variables:
         OPERATING_SYSTEM: "windows"
     artifacts:
@@ -20,7 +20,7 @@ Windows:
 
 OpenBSD:
     script:
-        - "./scripts/build.sh"
+        - "/bin/bash ./scripts/build.sh"
     variables:
         OPERATING_SYSTEM: "openbsd"
     artifacts:
@@ -29,7 +29,7 @@ OpenBSD:
 
 FreeBSD:
     script:
-        - "./scripts/build.sh"
+        - "/bin/bash ./scripts/build.sh"
     variables:
         OPERATING_SYSTEM: "freebsd"
     artifacts:
@@ -38,7 +38,7 @@ FreeBSD:
 
 NetBSD:
     script:
-        - "./scripts/build.sh"
+        - "/bin/bash ./scripts/build.sh"
     variables:
         OPERATING_SYSTEM: "netbsd"
     artifacts:
@@ -47,7 +47,7 @@ NetBSD:
 
 Darwin:
     script:
-        - "./scripts/build.sh"
+        - "/bin/bash ./scripts/build.sh"
     variables:
         OPERATING_SYSTEM: "darwin"
     artifacts:
