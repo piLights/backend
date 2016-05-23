@@ -14,7 +14,6 @@ var (
 	updateFromURL     = dioderAPI.Flag("updateURL", "The URL to fetch the new version from").Default(UPDATEURL).String()
 	configurationFile = dioderAPI.Flag("configurationFile", "The file to configure").ExistingFile()
 	password          = dioderAPI.Flag("password", "The password to protect the endpoint").String()
-	cpuProfile        = dioderAPI.Flag("cpuProfile", "Write the CPU-Profile to a file").String()
 	piBlaster         = dioderAPI.Flag("piBlaster", "Location of the piBlaster FIFO-file").ExistingFile()
 	serverName        = dioderAPI.Flag("serverName", "The name of the server").Default("Dioder Server").String()
 	ipv4only          = dioderAPI.Flag("4", "Forces dioderAPI to use IPv4 addresses only.").Short('4').Bool()

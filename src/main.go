@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"runtime/pprof"
 
 	"gopkg.in/alecthomas/kingpin.v2"
 
@@ -30,17 +29,6 @@ func main() {
 	logChan = make(chan interface{}, 100)
 	fatalChan = make(chan interface{}, 100)
 	go loggingService(logChan, fatalChan)
-
-	//Only for debugging!
-	if *cpuProfile != "" {
-		file, error := os.Create(*cpuProfile)
-		if error != nil {
-			log.Fatal(error)
-		}
-
-		pprof.StartCPUProfile(file)
-		defer pprof.StopCPUProfile()
-	}
 
 	//Check, if we should update
 	if *doUpdate {
