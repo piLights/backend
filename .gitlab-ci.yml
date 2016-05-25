@@ -7,56 +7,40 @@ before_script:
     - "go get -v -u google.golang.org/grpc"
     - "./buildscript.sh"
 
-Linux:
+.compileAndUpload:
     script:
         - "/bin/bash ./scripts/build.sh"
+    artifacts:
+        paths:
+            - dist/
+
+Linux:
+    <<: *compileAndUpload
     variables:
         OPERATING_SYSTEM: "linux"
-    artifacts:
-        paths:
-            - dist/
+
 
 Windows:
-    script:
-        - "/bin/bash ./scripts/build.sh"
+    <<: *compileAndUpload
     variables:
         OPERATING_SYSTEM: "windows"
-    artifacts:
-        paths:
-            - dist/
 
 OpenBSD:
-    script:
-        - "/bin/bash ./scripts/build.sh"
+    <<: *compileAndUpload
     variables:
         OPERATING_SYSTEM: "openbsd"
-    artifacts:
-        paths:
-            - dist/
 
 FreeBSD:
-    script:
-        - "/bin/bash ./scripts/build.sh"
+    <<: *compileAndUpload
     variables:
         OPERATING_SYSTEM: "freebsd"
-    artifacts:
-        paths:
-            - dist/
 
 NetBSD:
-    script:
-        - "/bin/bash ./scripts/build.sh"
+    <<: *compileAndUpload
     variables:
         OPERATING_SYSTEM: "netbsd"
-    artifacts:
-        paths:
-            - dist/
 
 Darwin:
-    script:
-        - "/bin/bash ./scripts/build.sh"
+    <<: *compileAndUpload
     variables:
         OPERATING_SYSTEM: "darwin"
-    artifacts:
-        paths:
-            - dist/
