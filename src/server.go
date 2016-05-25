@@ -74,15 +74,47 @@ func (s *server) CheckConnection(initMessage *LighterGRPC.InitMessage, stream Li
 		logChan <- fmt.Sprint("CheckConnection: Returning the current settings:", colorSet)
 		logChan <- "Saving the stream-connection"
 	}
-
 	streams[initMessage.DeviceID] = stream
 
-	error := stream.Send(&LighterGRPC.ColorMessage{onState, int32(colorSet.R), int32(colorSet.G), int32(colorSet.B), int32(colorSet.A), "Dioder-Server", ""})
-	if error != nil && *debug {
-		logChan <- error
+	//Handle the stream -> Send the new configuration to all other clients
+	ctx := stream.Context()
+
+	for clientID, clientStream := range streams {
+		colorMessage := &LighterGRPC.ColorMessage{
+			Onstate:  onState,
+			R:        int32(colorSet.R),
+			G:        int32(colorSet.G),
+			B:        int32(colorSet.B),
+			Opacity:  int32(colorSet.A),
+			DeviceID: *serverName,
+			Password: ""}
+
+		if clientID != initMessage.DeviceID {
+			select {
+			case <-ctx.Done():
+				return ctx.Err()
+			default:
+				error := clientStream.Send(colorMessage)
+				if error != nil {
+					if *debug {
+						logChan <- error
+					}
+					return error
+				}
+
+			}
+		} else {
+			error := stream.Send(colorMessage)
+			if error != nil && *debug {
+				logChan <- error
+			}
+
+			return error
+		}
 	}
 
-	return error
+	fatalChan <- errors.New("Reached final return after tried to send the colorMessage to all clients!")
+	return nil
 }
 
 //SwitchState switches the state (on/off) of the Didoer-Strips
