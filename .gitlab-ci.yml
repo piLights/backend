@@ -7,7 +7,7 @@ before_script:
     - "go get -v -u google.golang.org/grpc"
     - "./buildscript.sh"
 
-.compileAndUpload:
+.compileAndUploadTemplate: &compileAndUpload
     script:
         - "/bin/bash ./scripts/build.sh"
     artifacts:
