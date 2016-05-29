@@ -19,6 +19,7 @@ var (
 	dioderInstance dioder.Dioder
 	logChan        chan interface{}
 	fatalChan      chan interface{}
+	isMaster       bool
 )
 
 func main() {
@@ -52,6 +53,14 @@ func main() {
 	go startAutoConfigurationServer()
 
 	dioderInstance = dioder.New(dioder.Pins{Red: *redPin, Green: *greenPin, Blue: *bluePin}, *piBlaster)
+
+	if len(*slaveIPList) > 0 {
+		isMaster = true
+
+		if *debug {
+			logChan <- fmt.Sprintf("Running as master for the following slaves: %s", *slaveIPList)
+		}
+	}
 
 	startServer()
 }

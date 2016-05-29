@@ -18,4 +18,5 @@ var (
 	serverName        = dioderAPI.Flag("serverName", "The name of the server").Default("Dioder Server").String()
 	ipv4only          = dioderAPI.Flag("4", "Forces dioderAPI to use IPv4 addresses only.").Short('4').Bool()
 	ipv6only          = dioderAPI.Flag("6", "Forces dioderAPI to use IPv4 addresses only.").Short('6').Bool()
+	slaveIPList       = dioderAPI.Flag("slaveList", "List of Slave IPs").Short('s').IPList()
 )
