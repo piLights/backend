@@ -32,10 +32,10 @@ func startAutoConfigurationServer() {
 	}
 
 	//Publish the ServerName
-	publishRecord(`_dioder._tcp.local. 60 IN TXT "` + *serverName + `"`)
+	publishRecord(`_dioder._tcp.local. 10 IN TXT "` + *serverName + `"`)
 
 	//Register _dioder._tcp on the local mDNS domain
-	publishRecord("_services._dns-sd._udp.local. 60 IN PTR dioder._tcp.local.")
+	publishRecord("_services._dns-sd._udp.local. 10 IN PTR _dioder._tcp.local.")
 
 	cleanHostName := removeWhitespaces(*serverName)
 	//A record for servername.local for every IPv4 address
@@ -44,7 +44,7 @@ func startAutoConfigurationServer() {
 
 	//@ToDo: PTR for every IP to serverName.local
 
-	// SRV -> _dioder._tcp.local 60 IN SRV 0 0 PORT HOST
+	// SRV -> _dioder._tcp.local 10 IN SRV 0 0 PORT HOST
 	createSRVRecord(cleanHostName, port)
 }
 
@@ -74,7 +74,7 @@ func publishARecords(hostName string) {
 					log.Fatal(error)
 				}
 
-				publishRecord(hostName + ".local. 60 IN A " + ipAddress.String())
+				publishRecord(hostName + ".local. 10 IN A " + ipAddress.String())
 			}
 		}
 	}
@@ -82,7 +82,7 @@ func publishARecords(hostName string) {
 
 //createSRVRecord creates an SRV record announcing the service on the given host:port
 func createSRVRecord(hostName, port string) {
-	var srvRecord = "_dioder._tcp.local. 60 IN SRV 0 0 " + port + " " + hostName + ".local."
+	var srvRecord = "_dioder._tcp.local. 10 IN SRV 0 0 " + port + " " + hostName + ".local."
 	publishRecord(srvRecord)
 }
 
