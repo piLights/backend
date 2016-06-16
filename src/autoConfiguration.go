@@ -4,9 +4,21 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"strings"
+	"unicode"
 
 	"github.com/davecheney/mdns"
 )
+
+//removeWhitespaces removes all whitespaces from the given string
+func removeWhitespaces(str string) string {
+	return strings.Map(func(r rune) rune {
+		if unicode.IsSpace(r) {
+			return -1
+		}
+		return r
+	}, str)
+}
 
 //startServer starts the GRPC-server and binds to the defined address
 func startAutoConfigurationServer() {
@@ -14,51 +26,63 @@ func startAutoConfigurationServer() {
 		logChan <- fmt.Sprintf("Binding to %s", *bindTo)
 	}
 
-	publishRecord(`_dioder._tcp.local. 60 IN TXT "` + *serverName + `"`)
-
-	host, port, error := net.SplitHostPort(*bindTo)
+	_, port, error := net.SplitHostPort(*bindTo)
 	if error != nil {
 		log.Fatal(error)
 	}
 
-	if host != "" {
-		createSRVRecord(host, port)
-	} else {
-		//If no host is found, create an SRV-record for every IP on this machine
-		addressList, error := net.InterfaceAddrs()
-		if error != nil {
-			log.Fatal(error)
-		}
+	//Publish the ServerName
+	publishRecord(`_dioder._tcp.local. 60 IN TXT "` + *serverName + `"`)
 
-		for _, address := range addressList {
-			ipnet, ok := address.(*net.IPNet)
-			if ok && !ipnet.IP.IsLoopback() {
-				if ipnet.IP.String() != "" {
-					// Do not publish IPv4 records if IPv4 is disabled
-					if *ipv4only && ipnet.IP.To4() == nil {
-						continue
-					}
+	//Register _dioder._tcp on the local mDNS domain
+	publishRecord("_services._dns-sd._udp.local. 60 IN PTR dioder._tcp.local.")
 
-					// Do not publish IPv6 records if IPv6 is disabled
-					if *ipv6only && ipnet.IP.To4() != nil {
-						continue
-					}
+	cleanHostName := removeWhitespaces(*serverName)
+	//A record for servername.local for every IPv4 address
+	//AAAA record for serverName.local for every IPv6 address
+	publishARecords(cleanHostName)
 
-					ipAddress, _, error := net.ParseCIDR(address.String())
-					if error != nil {
-						log.Fatal(error)
-					}
+	//@ToDo: PTR for every IP to serverName.local
 
-					createSRVRecord(ipAddress.String(), port)
+	// SRV -> _dioder._tcp.local 60 IN SRV 0 0 PORT HOST
+	createSRVRecord(cleanHostName, port)
+}
+
+//publishARecords publishes an A or AAAA record on the given hostname with every interface-address
+func publishARecords(hostName string) {
+	addressList, error := net.InterfaceAddrs()
+	if error != nil {
+		log.Fatal(error)
+	}
+
+	for _, address := range addressList {
+		ipnet, ok := address.(*net.IPNet)
+		if ok && !ipnet.IP.IsLoopback() {
+			if ipnet.IP.String() != "" {
+				// Do not publish IPv4 records if IPv4 is disabled
+				if *ipv4only && ipnet.IP.To4() == nil {
+					continue
 				}
+
+				// Do not publish IPv6 records if IPv6 is disabled
+				if *ipv6only && ipnet.IP.To4() != nil {
+					continue
+				}
+
+				ipAddress, _, error := net.ParseCIDR(address.String())
+				if error != nil {
+					log.Fatal(error)
+				}
+
+				publishRecord(hostName + ".local. 60 IN A " + ipAddress.String())
 			}
 		}
 	}
 }
 
 //createSRVRecord creates an SRV record announcing the service on the given host:port
-func createSRVRecord(host, port string) {
-	var srvRecord = "_dioder._tcp.local. 60 IN SRV 0 0 " + port + " " + host
+func createSRVRecord(hostName, port string) {
+	var srvRecord = "_dioder._tcp.local. 60 IN SRV 0 0 " + port + " " + hostName + ".local."
 	publishRecord(srvRecord)
 }
 
