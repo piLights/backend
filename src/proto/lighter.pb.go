@@ -32,7 +32,9 @@ var _ = math.Inf
 
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the proto package it is being compiled against.
-const _ = proto.ProtoPackageIsVersion1
+// A compilation error at this line likely means your copy of the
+// proto package needs to be updated.
+const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
 
 type ColorMessage struct {
 	Onstate  bool   `protobuf:"varint,1,opt,name=onstate" json:"onstate,omitempty"`
@@ -92,7 +94,7 @@ var _ grpc.ClientConn
 
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the grpc package it is being compiled against.
-const _ = grpc.SupportPackageIsVersion2
+const _ = grpc.SupportPackageIsVersion3
 
 // Client API for Lighter service
 
@@ -249,7 +251,10 @@ var _Lighter_serviceDesc = grpc.ServiceDesc{
 			ServerStreams: true,
 		},
 	},
+	Metadata: fileDescriptor0,
 }
+
+func init() { proto.RegisterFile("lighter.proto", fileDescriptor0) }
 
 var fileDescriptor0 = []byte{
 	// 316 bytes of a gzipped FileDescriptorProto
