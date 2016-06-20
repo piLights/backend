@@ -1,14 +1,45 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"net"
+	"strconv"
 	"strings"
 	"unicode"
 
 	"github.com/davecheney/mdns"
 )
+
+const hexDigit = "0123456789abcdef"
+
+// reverseAddr returns the in-addr.arpa. or ip6.arpa. hostname of the IP
+// address suitable for reverse DNS (PTR) record lookups or an error if it fails
+// to parse the IP address. - this is from the oficial golang-code
+func reverseAddr(addr string) (arpa string, err error) {
+	ip := net.ParseIP(addr)
+	if ip == nil {
+		return "", errors.New("unrecognized address: " + addr)
+	}
+	if ip.To4() != nil {
+		return strconv.Itoa(int(ip[15])) + "." + strconv.Itoa(int(ip[14])) + "." + strconv.Itoa(int(ip[13])) + "." +
+			strconv.Itoa(int(ip[12])) + ".in-addr.arpa.", nil
+	}
+	// Must be IPv6
+	buf := make([]byte, 0, len(ip)*4+len("ip6.arpa."))
+	// Add it, in reverse, to the buffer
+	for i := len(ip) - 1; i >= 0; i-- {
+		v := ip[i]
+		buf = append(buf, hexDigit[v&0xF])
+		buf = append(buf, '.')
+		buf = append(buf, hexDigit[v>>4])
+		buf = append(buf, '.')
+	}
+	// Append "ip6.arpa." and return (buf already has the final .)
+	buf = append(buf, "ip6.arpa."...)
+	return string(buf), nil
+}
 
 //removeWhitespaces removes all whitespaces from the given string
 func removeWhitespaces(str string) string {
@@ -42,8 +73,6 @@ func startAutoConfigurationServer() {
 	//AAAA record for serverName.local for every IPv6 address
 	publishARecords(cleanHostName)
 
-	//@ToDo: PTR for every IP to serverName.local
-
 	// SRV -> _dioder._tcp.local 10 IN SRV 0 0 PORT HOST
 	createSRVRecord(cleanHostName, port)
 }
@@ -75,6 +104,13 @@ func publishARecords(hostName string) {
 				}
 
 				publishRecord(hostName + ".local. 10 IN A " + ipAddress.String())
+
+				arpaAddr, error := reverseAddr(ipAddress.String())
+				if error != nil {
+					log.Fatal(error)
+				}
+
+				publishRecord(arpaAddr + "10 IN PTR _dioder._tcp.local.")
 			}
 		}
 	}
