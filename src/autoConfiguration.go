@@ -114,7 +114,7 @@ func publishARecords(hostName string) {
 					log.Fatal(error)
 				}
 
-				publishRecord(arpaAddr + "10 IN PTR _dioder._tcp.local.")
+				publishRecord(arpaAddr + " 10 IN PTR _dioder._tcp.local.")
 			}
 		}
 	}
