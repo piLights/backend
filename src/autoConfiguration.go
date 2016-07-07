@@ -103,7 +103,11 @@ func publishARecords(hostName string) {
 					log.Fatal(error)
 				}
 
-				publishRecord(hostName + ".local. 10 IN A " + ipAddress.String())
+				if ipnet.IP.To4() != nil {
+					publishRecord(hostName + ".local. 10 IN A " + ipAddress.String())
+				} else {
+					publishRecord(hostName + ".local. 10 IN AAAA " + ipAddress.String())
+				}
 
 				arpaAddr, error := reverseAddr(ipAddress.String())
 				if error != nil {
