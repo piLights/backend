@@ -53,22 +53,22 @@ func removeWhitespaces(str string) string {
 
 //startServer starts the GRPC-server and binds to the defined address
 func startAutoConfigurationServer() {
-	if *debug {
-		logChan <- fmt.Sprintf("Binding to %s", *bindTo)
+	if DioderConfiguration.Debug {
+		logChan <- fmt.Sprintf("Binding to %s", DioderConfiguration.BindTo)
 	}
 
-	_, port, error := net.SplitHostPort(*bindTo)
+	_, port, error := net.SplitHostPort(DioderConfiguration.BindTo)
 	if error != nil {
 		log.Fatal(error)
 	}
 
 	//Publish the ServerName
-	publishRecord(`_dioder._tcp.local. 10 IN TXT "` + *serverName + `"`)
+	publishRecord(`_dioder._tcp.local. 10 IN TXT "` + DioderConfiguration.ServerName + `"`)
 
 	//Register _dioder._tcp on the local mDNS domain
 	publishRecord("_services._dns-sd._udp.local. 10 IN PTR _dioder._tcp.local.")
 
-	cleanHostName := removeWhitespaces(*serverName)
+	cleanHostName := removeWhitespaces(DioderConfiguration.ServerName)
 	//A record for servername.local for every IPv4 address
 	//AAAA record for serverName.local for every IPv6 address
 	publishARecords(cleanHostName)
@@ -89,12 +89,12 @@ func publishARecords(hostName string) {
 		if ok && !ipnet.IP.IsLoopback() {
 			if ipnet.IP.String() != "" {
 				// Do not publish IPv4 records if IPv4 is disabled
-				if *ipv4only && ipnet.IP.To4() == nil {
+				if DioderConfiguration.IPv4Only && ipnet.IP.To4() == nil {
 					continue
 				}
 
 				// Do not publish IPv6 records if IPv6 is disabled
-				if *ipv6only && ipnet.IP.To4() != nil {
+				if DioderConfiguration.IPv6Only && ipnet.IP.To4() != nil {
 					continue
 				}
 
@@ -128,7 +128,7 @@ func createSRVRecord(hostName, port string) {
 
 //publishRecord publishes an record
 func publishRecord(resourceRecord string) {
-	if *debug {
+	if DioderConfiguration.Debug {
 		logChan <- fmt.Sprintf("Setting resourceRecord: %s", resourceRecord)
 	}
 

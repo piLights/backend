@@ -22,12 +22,12 @@ var onState bool
 
 //SetColor sets the color of the Dioder-strips
 func (s *server) SetColor(ctx context.Context, colorMessage *LighterGRPC.ColorMessage) (*LighterGRPC.Confirmation, error) {
-	if *debug {
+	if DioderConfiguration.Debug {
 		logChan <- fmt.Sprint("SetColor:", colorMessage)
 	}
 
-	if *password != "" && *password != colorMessage.Password {
-		if *debug {
+	if DioderConfiguration.Password != "" && DioderConfiguration.Password != colorMessage.Password {
+		if DioderConfiguration.Debug {
 			logChan <- "Not authorized"
 		}
 		return nil, errors.New("Not authorized")
@@ -44,7 +44,7 @@ func (s *server) SetColor(ctx context.Context, colorMessage *LighterGRPC.ColorMe
 
 	for deviceID, stream := range streams {
 		if deviceID != colorMessage.DeviceID {
-			if *debug {
+			if DioderConfiguration.Debug {
 				logChan <- fmt.Sprintf("Sending the colormessage to remote device %s\n", deviceID)
 			}
 
@@ -56,13 +56,13 @@ func (s *server) SetColor(ctx context.Context, colorMessage *LighterGRPC.ColorMe
 }
 
 func (s *server) CheckConnection(initMessage *LighterGRPC.InitMessage, stream LighterGRPC.Lighter_CheckConnectionServer) error {
-	if *debug {
+	if DioderConfiguration.Debug {
 		logChan <- fmt.Sprint("CheckConnection", initMessage)
 	}
 
-	if *password != "" && *password != initMessage.Password {
+	if DioderConfiguration.Password != "" && DioderConfiguration.Password != initMessage.Password {
 		error := errors.New("Not authorized")
-		if *debug {
+		if DioderConfiguration.Debug {
 			logChan <- error
 		}
 		return error
@@ -70,7 +70,7 @@ func (s *server) CheckConnection(initMessage *LighterGRPC.InitMessage, stream Li
 
 	colorSet := dioderInstance.GetCurrentColor()
 
-	if *debug {
+	if DioderConfiguration.Debug {
 		logChan <- fmt.Sprint("CheckConnection: Returning the current settings:", colorSet)
 		logChan <- "Saving the stream-connection"
 	}
@@ -78,7 +78,7 @@ func (s *server) CheckConnection(initMessage *LighterGRPC.InitMessage, stream Li
 	streams[initMessage.DeviceID] = stream
 
 	error := stream.Send(&LighterGRPC.ColorMessage{onState, int32(colorSet.R), int32(colorSet.G), int32(colorSet.B), int32(colorSet.A), "Dioder-Server", ""})
-	if error != nil && *debug {
+	if error != nil && DioderConfiguration.Debug {
 		logChan <- error
 	}
 
@@ -87,12 +87,12 @@ func (s *server) CheckConnection(initMessage *LighterGRPC.InitMessage, stream Li
 
 //SwitchState switches the state (on/off) of the Didoer-Strips
 func (s *server) SwitchState(ctx context.Context, stateMessage *LighterGRPC.StateMessage) (*LighterGRPC.Confirmation, error) {
-	if *debug {
+	if DioderConfiguration.Debug {
 		logChan <- fmt.Sprintln("SwitchState", stateMessage)
 	}
 
-	if *password != "" && *password != stateMessage.Password {
-		if *debug {
+	if DioderConfiguration.Password != "" && DioderConfiguration.Password != stateMessage.Password {
+		if DioderConfiguration.Debug {
 			logChan <- "Not authorized"
 		}
 		return nil, errors.New("Not authorized")
@@ -111,8 +111,8 @@ func (s *server) SwitchState(ctx context.Context, stateMessage *LighterGRPC.Stat
 
 //startServer starts the GRPC-server and binds to the defined address
 func startServer() {
-	if *debug {
-		logChan <- fmt.Sprintf("Binding to %s", *bindTo)
+	if DioderConfiguration.Debug {
+		logChan <- fmt.Sprintf("Binding to %s", DioderConfiguration.BindTo)
 	}
 
 	//Initialize the streams-map
@@ -120,23 +120,23 @@ func startServer() {
 
 	protocol := "tcp"
 
-	if *ipv4only {
-		if *debug {
+	if DioderConfiguration.IPv4Only {
+		if DioderConfiguration.Debug {
 			logChan <- "Forced to listen on IPv4 only."
 		}
 
 		protocol = "tcp4"
 	}
 
-	if *ipv6only {
-		if *debug {
+	if DioderConfiguration.IPv6Only {
+		if DioderConfiguration.Debug {
 			logChan <- "Forced to listen on IPv6 only."
 		}
 
 		protocol = "tcp6"
 	}
 
-	listener, error := net.Listen(protocol, *bindTo)
+	listener, error := net.Listen(protocol, DioderConfiguration.BindTo)
 	if error != nil {
 		logChan <- fmt.Sprintf("failed to listen: %v", error)
 	}
@@ -145,7 +145,7 @@ func startServer() {
 
 	LighterGRPC.RegisterLighterServer(grpcServer, &server{})
 
-	fmt.Printf("Listening on %s...\n", *bindTo)
+	fmt.Printf("Listening on %s...\n", DioderConfiguration.BindTo)
 
 	grpcServer.Serve(listener)
 }

@@ -1,21 +1,79 @@
 package main
 
-import "gopkg.in/alecthomas/kingpin.v2"
+import "github.com/urfave/cli"
 
-var (
-	dioderAPI = kingpin.New("dioderAPI", "An RPC interface to Ikea-Dioder")
+var doUpdate bool
 
-	bindTo            = dioderAPI.Flag("bindTo", "Address and port to listen on, defaults to 0.0.0.0:13337").Default(":13337").Short('p').String()
-	redPin            = dioderAPI.Flag("red", "Number of the red-pin").Default("18").OverrideDefaultFromEnvar("dioderRedPin").Short('r').String()
-	greenPin          = dioderAPI.Flag("green", "Number of the green-pin").Default("4").OverrideDefaultFromEnvar("dioderGreenPin").Short('g').String()
-	bluePin           = dioderAPI.Flag("blue", "Number of the blue-pin").Default("17").OverrideDefaultFromEnvar("dioderBluePin").Short('b').String()
-	debug             = dioderAPI.Flag("debug", "Debug-mode").Bool()
-	doUpdate          = dioderAPI.Flag("update", "Update the program to the latest version").Bool()
-	updateFromURL     = dioderAPI.Flag("updateURL", "The URL to fetch the new version from").Default(UPDATEURL).String()
-	configurationFile = dioderAPI.Flag("configurationFile", "The file to configure").ExistingFile()
-	password          = dioderAPI.Flag("password", "The password to protect the endpoint").String()
-	piBlaster         = dioderAPI.Flag("piBlaster", "Location of the piBlaster FIFO-file").ExistingFile()
-	serverName        = dioderAPI.Flag("serverName", "The name of the server").Default("Dioder Server").String()
-	ipv4only          = dioderAPI.Flag("4", "Forces dioderAPI to use IPv4 addresses only.").Short('4').Bool()
-	ipv6only          = dioderAPI.Flag("6", "Forces dioderAPI to use IPv4 addresses only.").Short('6').Bool()
-)
+var applicationFlags = []cli.Flag{
+	cli.StringFlag{
+		Name:        "configurationFile",
+		Usage:       "Path to the configuration-file",
+		Destination: &DioderConfiguration.ConfigurationFile,
+	},
+	cli.BoolFlag{
+		Name:        "update",
+		Usage:       "Fetch the newest version",
+		Destination: &doUpdate,
+	},
+	cli.StringFlag{
+		Name:        "redPin",
+		Value:       "18",
+		Usage:       "Number of the red pin",
+		Destination: &DioderConfiguration.Pins.Red,
+	},
+	cli.StringFlag{
+		Name:        "bluePin",
+		Value:       "18",
+		Usage:       "Number of the blue pin",
+		Destination: &DioderConfiguration.Pins.Blue,
+	},
+	cli.StringFlag{
+		Name:        "greenPin",
+		Value:       "18",
+		Usage:       "Number of the green pin",
+		Destination: &DioderConfiguration.Pins.Green,
+	},
+	cli.StringFlag{
+		Name:        "bindTo",
+		Value:       ":13337",
+		Usage:       "Address and port to listen on, defaults to 0.0.0.0:13337",
+		Destination: &DioderConfiguration.BindTo,
+	},
+	cli.BoolFlag{
+		Name:        "debug",
+		Usage:       "Turn on the debug-mode",
+		Destination: &DioderConfiguration.Debug,
+	},
+	cli.StringFlag{
+		Name:        "password",
+		Usage:       "The password to protect the endpoint",
+		Destination: &DioderConfiguration.Password,
+	},
+	cli.StringFlag{
+		Name:        "piBlaster",
+		Usage:       "Location of the piBlaster FIFO-file",
+		Destination: &DioderConfiguration.PiBlaster,
+	},
+	cli.StringFlag{
+		Name:        "serverName",
+		Usage:       "The name of the server",
+		Value:       "Dioder Server",
+		Destination: &DioderConfiguration.ServerName,
+	},
+	cli.StringFlag{
+		Name:        "updateURL",
+		Usage:       "Fetch the update from the given URL",
+		Value:       UPDATEURL,
+		Destination: &DioderConfiguration.UpdateURL,
+	},
+	cli.BoolFlag{
+		Name:        "ipv4Only",
+		Usage:       "Enables only IPv4",
+		Destination: &DioderConfiguration.IPv4Only,
+	},
+	cli.BoolFlag{
+		Name:        "ipv6Only",
+		Usage:       "Enables only IPv6",
+		Destination: &DioderConfiguration.IPv6Only,
+	},
+}

@@ -4,11 +4,13 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"os"
+
+	"github.com/piLights/dioder"
 )
 
 type Configuration struct {
 	BindTo            string
-	Pins              map[string]int
+	Pins              dioder.Pins
 	Debug             bool
 	UpdateURL         string
 	ConfigurationFile string
@@ -34,6 +36,11 @@ func (config *Configuration) WriteConfigurationToFile(fileName string) error {
 }
 
 func NewConfiguration(fileName string) error {
+	if fileName == "" {
+		DioderConfiguration = Configuration{}
+		return nil
+	}
+
 	content, error := ioutil.ReadFile(fileName)
 	if error != nil {
 		return error
