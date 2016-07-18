@@ -2,18 +2,19 @@ package main
 
 import "github.com/urfave/cli"
 
-var doUpdate bool
-
 var applicationFlags = []cli.Flag{
+	cli.StringFlag{
+		Name:  "writeConfiguration",
+		Usage: "Write the current configuration to the given file",
+	},
 	cli.StringFlag{
 		Name:        "configurationFile",
 		Usage:       "Path to the configuration-file",
 		Destination: &DioderConfiguration.ConfigurationFile,
 	},
 	cli.BoolFlag{
-		Name:        "update",
-		Usage:       "Fetch the newest version",
-		Destination: &doUpdate,
+		Name:  "update",
+		Usage: "Fetch the newest version",
 	},
 	cli.StringFlag{
 		Name:        "redPin",

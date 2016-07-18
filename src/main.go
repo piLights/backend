@@ -30,14 +30,25 @@ func main() {
 		go loggingService(logChan, fatalChan)
 
 		//Check, if we should update
-		if doUpdate {
+		if c.Bool("update") {
 			startUpdate()
 			return nil
 		}
 
-		/*if *configurationFile != "" {
-			parseConfiguration(DioderConfiguration.ConfigurationFile)
-		}*/
+		if c.String("writeConfiguration") != "" {
+			fmt.Println(DioderConfiguration)
+			error := DioderConfiguration.WriteConfigurationToFile(c.String("writeConfiguration"))
+
+			return error
+		}
+
+		if c.String("configurationFile") != "" {
+			error := NewConfiguration(c.String("configurationFile"))
+
+			if error != nil {
+				return error
+			}
+		}
 
 		//Set the pins
 		if DioderConfiguration.Debug {
