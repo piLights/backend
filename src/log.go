@@ -9,7 +9,7 @@ func loggingService(logChan, fatalChan chan interface{}) {
 	//Ldate | Ltime | Lmicroseconds | Llongfile
 	//Open
 
-	if *debug {
+	if DioderConfiguration.Debug {
 		logChan <- "Starting the logging service."
 	}
 
