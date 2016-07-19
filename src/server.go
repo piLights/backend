@@ -89,7 +89,7 @@ func (s *server) ChangeServerParameter(ctx context.Context, changeParameterMessa
 	return nil, errors.New("Not implemented")
 }
 
-func (s *server) LoadServerConfig(ctx context.Context, changeParameterMessage *LighterGRPC.LoadServerRequest) (*LighterGRPC.ServerConfig, error) {
+func (s *server) LoadServerConfig(ctx context.Context, changeParameterMessage *LighterGRPC.LoadConfigRequest) (*LighterGRPC.ServerConfig, error) {
 	return nil, errors.New("Not implemented")
 }
 
