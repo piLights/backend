@@ -57,6 +57,7 @@ message ChangeParameterMessage {
         string serverName = 2;
         FadeTime fadeTime = 3;
         IPVersion ipversion = 4;
+        Pins pins = 5;
     }
 }
 
@@ -71,6 +72,12 @@ message IPVersion {
         IPV6ONLY = 2;
     }
     Version version = 1;
+}
+
+message Pins {
+    int32 redPin = 1;
+    int32 greenPin = 2;
+    int32 bluePin = 3;
 }
 
 message ScheduledSwitch {

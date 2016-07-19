@@ -85,6 +85,18 @@ func (s *server) CheckConnection(initMessage *LighterGRPC.InitMessage, stream Li
 	return error
 }
 
+func (s *server) ChangeServerParameter(ctx context.Context, changeParameterMessage *LighterGRPC.ChangeParameterMessage) (*LighterGRPC.Confirmation, error) {
+	return nil, errors.New("Not implemented")
+}
+
+func (s *server) LoadServerConfig(ctx context.Context, changeParameterMessage *LighterGRPC.LoadServerRequest) (*LighterGRPC.ServerConfig, error) {
+	return nil, errors.New("Not implemented")
+}
+
+func (s *server) ScheduleSwitchState(ctx context.Context, changeParameterMessage *LighterGRPC.ScheduledSwitch) (*LighterGRPC.Confirmation, error) {
+	return nil, errors.New("Not implemented")
+}
+
 //SwitchState switches the state (on/off) of the Didoer-Strips
 func (s *server) SwitchState(ctx context.Context, stateMessage *LighterGRPC.StateMessage) (*LighterGRPC.Confirmation, error) {
 	if DioderConfiguration.Debug {
