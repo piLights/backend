@@ -9,6 +9,9 @@ service Lighter {
     rpc setColor(ColorMessage) returns (Confirmation) {};
     rpc checkConnection(InitMessage) returns (stream ColorMessage) {};
     rpc switchState(StateMessage) returns (Confirmation) {};
+    rpc loadServerConfig(LoadServerRequest) returns (ServerConfig) {};
+    rpc changeServerParameter(ChangeParameterMessage) returns (Confirmation) {};
+    rpc scheduleSwitchState(ScheduledSwitch) returns (Confirmation) {};
 }
 
 message ColorMessage {
@@ -35,4 +38,44 @@ message Confirmation {
 message InitMessage {
     string deviceID = 1;
     string password = 2;
+}
+
+message LoadServerRequest {
+    string deviceID = 1;
+    string password = 2;
+}
+
+message ServerConfig {
+    string serverName = 1;
+    FadeTime fadeTime = 2;
+    IPVersion ipVersion = 3;
+}
+
+message ChangeParameterMessage {
+    string password = 1;
+    oneof parameter {
+        string serverName = 2;
+        FadeTime fadeTime = 3;
+        IPVersion ipversion = 4;
+    }
+}
+
+message FadeTime {
+    int32 millis = 1;
+}
+
+message IPVersion {
+    enum Version {
+        DUAL = 0;
+        IPV4ONLY = 1;
+        IPV6ONLY = 2;
+    }
+    Version version = 1;
+}
+
+message ScheduledSwitch {
+    int64 time = 1;
+    bool onstate = 2;
+    string deviceID = 3;
+    string password = 4;
 }
