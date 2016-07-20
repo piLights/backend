@@ -2,11 +2,12 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"runtime"
 
 	"github.com/inconshreveable/go-update"
+	"github.com/piLights/dioder-rpc/src/configuration"
+	"github.com/piLights/dioder-rpc/src/logging"
 )
 
 //UPDATEURL is the URL from which the updates for the OS and architecture are fetched from
@@ -15,13 +16,13 @@ const UPDATEURL = "https://github.com/piLights/dioder-rpc/releases/download/pre-
 //startUpdate starts the updateProcess
 func startUpdate() {
 	fmt.Println("Starting update...")
-	if DioderConfiguration.Debug {
-		logChan <- fmt.Sprintf("Downloading from %s\n", DioderConfiguration.UpdateURL)
+	if configuration.DioderConfiguration.Debug {
+		logging.Log.LogChan <- fmt.Sprintf("Downloading from %s\n", configuration.DioderConfiguration.UpdateURL)
 	}
-	error := updateBinary(DioderConfiguration.UpdateURL)
+	error := updateBinary(configuration.DioderConfiguration.UpdateURL)
 	if error != nil {
 		fmt.Println("Updating failed!")
-		log.Fatal(error)
+		logging.Log.FatalChan <- error
 	}
 
 	fmt.Println("Updated successfully")
