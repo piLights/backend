@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	"os"
+	"os/signal"
 
 	"github.com/piLights/dioder"
 	"github.com/urfave/cli"
@@ -59,13 +60,25 @@ func main() {
 
 		dioderInstance = dioder.New(dioder.Pins{Red: DioderConfiguration.Pins.Red, Green: DioderConfiguration.Pins.Green, Blue: DioderConfiguration.Pins.Blue}, DioderConfiguration.PiBlaster)
 
+		//Handle CTRL  + C
+		osSignalChan := make(chan os.Signal, 1)
+		signal.Notify(osSignalChan, os.Interrupt)
+		go func() {
+			<-osSignalChan
+
+			dioderInstance.Release()
+
+			os.Exit(0)
+		}()
+
 		startServer()
+
+		defer dioderInstance.Release()
 
 		return nil
 	}
 
 	application.Run(os.Args)
-
 }
 
 //hashPassword hashes the defined password with SHA256
