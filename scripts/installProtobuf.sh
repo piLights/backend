@@ -5,4 +5,4 @@ set -ex
 #cd *protobuf* && ./configure --prefix=/usr && make && sudo make install
 wget https://github.com/google/protobuf/releases/download/v3.0.0/protoc-3.0.0-linux-x86_64.zip
 unzip protoc-3.0.0-linux-x86_64.zip
-sudo cp protoc /usr/bin
+sudo cp bin/protoc /usr/bin
