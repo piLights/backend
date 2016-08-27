@@ -10,7 +10,7 @@ env:
     - OPERATING_SYSTEM=darwin
 
 go:
-  - 1.6
+  - 1.7
 
 before_install:
   - ./scripts/installProtobuf.sh
