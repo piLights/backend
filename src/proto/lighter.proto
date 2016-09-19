@@ -78,6 +78,7 @@ message Pins {
     int32 redPin = 1;
     int32 greenPin = 2;
     int32 bluePin = 3;
+    int32 whitePin = 4;
 }
 
 message ScheduledSwitch {
