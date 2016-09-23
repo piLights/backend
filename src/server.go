@@ -8,7 +8,7 @@ import (
 
 	"google.golang.org/grpc"
 
-	"github.com/piLights/dioder-rpc/src/proto"
+	"gitlab.com/piLights/proto"
 	"golang.org/x/net/context"
 )
 
@@ -91,6 +91,10 @@ func (s *server) ChangeServerParameter(ctx context.Context, changeParameterMessa
 
 func (s *server) LoadServerConfig(ctx context.Context, changeParameterMessage *LighterGRPC.LoadConfigRequest) (*LighterGRPC.ServerConfig, error) {
 	return nil, errors.New("Not implemented")
+}
+
+func (s *server) LoadServerLog(logRequest *LighterGRPC.LogRequest, server LighterGRPC.Lighter_LoadServerLogServer) error {
+	return errors.New("Not implemented")
 }
 
 func (s *server) ScheduleSwitchState(ctx context.Context, changeParameterMessage *LighterGRPC.ScheduledSwitch) (*LighterGRPC.Confirmation, error) {
