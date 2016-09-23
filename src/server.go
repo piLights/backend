@@ -52,7 +52,7 @@ func (s *server) SetColor(ctx context.Context, colorMessage *LighterGRPC.ColorMe
 		}
 	}
 
-	return &LighterGRPC.Confirmation{true}, nil
+	return &LighterGRPC.Confirmation{Success: true}, nil
 }
 
 func (s *server) CheckConnection(initMessage *LighterGRPC.InitMessage, stream LighterGRPC.Lighter_CheckConnectionServer) error {
@@ -77,6 +77,7 @@ func (s *server) CheckConnection(initMessage *LighterGRPC.InitMessage, stream Li
 
 	streams[initMessage.DeviceID] = stream
 
+	//@ToDo: Do not use unkeyed fields!
 	error := stream.Send(&LighterGRPC.ColorMessage{onState, int32(colorSet.R), int32(colorSet.G), int32(colorSet.B), int32(colorSet.A), "Dioder-Server", ""})
 	if error != nil && DioderConfiguration.Debug {
 		logChan <- error
@@ -122,7 +123,7 @@ func (s *server) SwitchState(ctx context.Context, stateMessage *LighterGRPC.Stat
 
 	onState = stateMessage.Onstate
 
-	return &LighterGRPC.Confirmation{true}, nil
+	return &LighterGRPC.Confirmation{Success: true}, nil
 }
 
 //startServer starts the GRPC-server and binds to the defined address
