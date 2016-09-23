@@ -46,6 +46,6 @@ func saveLog(line string) {
 		Message: line,
 	}
 
-	logList.entryList = append(logList.EntryList, entry)
+	logList.EntryList = append(logList.EntryList, entry)
 	logList.Count++
 }
