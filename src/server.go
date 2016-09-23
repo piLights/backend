@@ -8,7 +8,7 @@ import (
 
 	"google.golang.org/grpc"
 
-	"github.com/piLights/dioder-rpc/src/proto"
+	"gitlab.com/piLights/proto"
 	"golang.org/x/net/context"
 )
 
@@ -52,7 +52,7 @@ func (s *server) SetColor(ctx context.Context, colorMessage *LighterGRPC.ColorMe
 		}
 	}
 
-	return &LighterGRPC.Confirmation{true}, nil
+	return &LighterGRPC.Confirmation{Success: true}, nil
 }
 
 func (s *server) CheckConnection(initMessage *LighterGRPC.InitMessage, stream LighterGRPC.Lighter_CheckConnectionServer) error {
@@ -77,6 +77,7 @@ func (s *server) CheckConnection(initMessage *LighterGRPC.InitMessage, stream Li
 
 	streams[initMessage.DeviceID] = stream
 
+	//@ToDo: Do not use unkeyed fields!
 	error := stream.Send(&LighterGRPC.ColorMessage{onState, int32(colorSet.R), int32(colorSet.G), int32(colorSet.B), int32(colorSet.A), "Dioder-Server", ""})
 	if error != nil && DioderConfiguration.Debug {
 		logChan <- error
@@ -91,6 +92,14 @@ func (s *server) ChangeServerParameter(ctx context.Context, changeParameterMessa
 
 func (s *server) LoadServerConfig(ctx context.Context, changeParameterMessage *LighterGRPC.LoadConfigRequest) (*LighterGRPC.ServerConfig, error) {
 	return nil, errors.New("Not implemented")
+}
+
+func (s *server) LoadServerLog(logRequest *LighterGRPC.LogRequest, server LighterGRPC.Lighter_LoadServerLogServer) error {
+	for _, logEntry := range getLogEntryList().EntryList {
+		server.Send(logEntry)
+	}
+
+	return errors.New("Not implemented")
 }
 
 func (s *server) ScheduleSwitchState(ctx context.Context, changeParameterMessage *LighterGRPC.ScheduledSwitch) (*LighterGRPC.Confirmation, error) {
@@ -118,7 +127,7 @@ func (s *server) SwitchState(ctx context.Context, stateMessage *LighterGRPC.Stat
 
 	onState = stateMessage.Onstate
 
-	return &LighterGRPC.Confirmation{true}, nil
+	return &LighterGRPC.Confirmation{Success: true}, nil
 }
 
 //startServer starts the GRPC-server and binds to the defined address
