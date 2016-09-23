@@ -9,8 +9,8 @@ import (
 )
 
 type logEntryList struct {
-	entryList []*LighterGRPC.LogEntry
-	count     int
+	EntryList []*LighterGRPC.LogEntry
+	Count     int
 }
 
 var logList logEntryList
@@ -46,5 +46,6 @@ func saveLog(line string) {
 		Message: line,
 	}
 
-	logList.entryList = append(logList.entryList, entry)
+	logList.entryList = append(logList.EntryList, entry)
+	logList.Count++
 }

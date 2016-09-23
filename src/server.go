@@ -95,7 +95,7 @@ func (s *server) LoadServerConfig(ctx context.Context, changeParameterMessage *L
 }
 
 func (s *server) LoadServerLog(logRequest *LighterGRPC.LogRequest, server LighterGRPC.Lighter_LoadServerLogServer) error {
-	for _, logEntry := range getLogEntryList().entryList {
+	for _, logEntry := range getLogEntryList().EntryList {
 		server.Send(logEntry)
 	}
 
