@@ -95,6 +95,10 @@ func (s *server) LoadServerConfig(ctx context.Context, changeParameterMessage *L
 }
 
 func (s *server) LoadServerLog(logRequest *LighterGRPC.LogRequest, server LighterGRPC.Lighter_LoadServerLogServer) error {
+	for _, logEntry := range getLogEntryList().entryList {
+		server.Send(logEntry)
+	}
+
 	return errors.New("Not implemented")
 }
 
