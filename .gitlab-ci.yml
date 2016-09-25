@@ -2,12 +2,11 @@ image: jsfn/golang-protoc
 
 before_script:
     - "git submodule init"
-    - "make updateSubmodule"
-    - "ls -lsa src/proto"
     - "go get -v -u github.com/golang/protobuf/{proto,protoc-gen-go}"
     - "go get -v -u github.com/mitchellh/gox"
     - "go get -v -u github.com/tcnksm/ghr"
     - "go get -v -u google.golang.org/grpc"
+    - "go get -v -u gitlab.com/piLights/proto"
     - "./buildscript.sh"
 
 .compileAndUploadTemplate: &compileAndUpload
