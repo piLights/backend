@@ -13,3 +13,6 @@ proto:
 
 run:
 	@go run src/*.go
+
+updateSubmodule:
+	@git submodule update --remote --merge
