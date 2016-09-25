@@ -2,6 +2,7 @@ image: jsfn/golang-protoc
 
 before_script:
     - "git submodule init"
+    - "make updateSubmodule"
     - "make proto"
     - "go get -v -u github.com/golang/protobuf/{proto,protoc-gen-go}"
     - "go get -v -u github.com/mitchellh/gox"
