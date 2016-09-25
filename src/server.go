@@ -15,10 +15,16 @@ import (
 //server implements the server-interface required by GRPC
 type server struct{}
 
-//Holds all streams
-var streams map[string]LighterGRPC.Lighter_CheckConnectionServer
+var (
+	//Holds all streams
+	streams map[string]LighterGRPC.Lighter_CheckConnectionServer
 
-var onState bool
+	onState bool
+
+	//Errors
+	errNotAuthorized  = errors.New("Not authorized")
+	errNotImplemented = errors.New("Not implemented")
+)
 
 //SetColor sets the color of the Dioder-strips
 func (s *server) SetColor(ctx context.Context, colorMessage *LighterGRPC.ColorMessage) (*LighterGRPC.Confirmation, error) {
@@ -30,7 +36,7 @@ func (s *server) SetColor(ctx context.Context, colorMessage *LighterGRPC.ColorMe
 		if DioderConfiguration.Debug {
 			logChan <- "Not authorized"
 		}
-		return nil, errors.New("Not authorized")
+		return nil, errNotAuthorized
 	}
 
 	opacity := uint8(colorMessage.Opacity)
@@ -55,13 +61,13 @@ func (s *server) SetColor(ctx context.Context, colorMessage *LighterGRPC.ColorMe
 	return &LighterGRPC.Confirmation{Success: true}, nil
 }
 
-func (s *server) CheckConnection(initMessage *LighterGRPC.InitMessage, stream LighterGRPC.Lighter_CheckConnectionServer) error {
+func (s *server) CheckConnection(request *LighterGRPC.Request, stream LighterGRPC.Lighter_CheckConnectionServer) error {
 	if DioderConfiguration.Debug {
-		logChan <- fmt.Sprint("CheckConnection", initMessage)
+		logChan <- fmt.Sprint("CheckConnection", request)
 	}
 
-	if DioderConfiguration.Password != "" && DioderConfiguration.Password != initMessage.Password {
-		error := errors.New("Not authorized")
+	if DioderConfiguration.Password != "" && DioderConfiguration.Password != request.Password {
+		error := errNotAuthorized
 		if DioderConfiguration.Debug {
 			logChan <- error
 		}
@@ -75,7 +81,7 @@ func (s *server) CheckConnection(initMessage *LighterGRPC.InitMessage, stream Li
 		logChan <- "Saving the stream-connection"
 	}
 
-	streams[initMessage.DeviceID] = stream
+	streams[request.DeviceID] = stream
 
 	//@ToDo: Do not use unkeyed fields!
 	error := stream.Send(&LighterGRPC.ColorMessage{onState, int32(colorSet.R), int32(colorSet.G), int32(colorSet.B), int32(colorSet.A), "Dioder-Server", ""})
@@ -87,11 +93,15 @@ func (s *server) CheckConnection(initMessage *LighterGRPC.InitMessage, stream Li
 }
 
 func (s *server) ChangeServerParameter(ctx context.Context, changeParameterMessage *LighterGRPC.ChangeParameterMessage) (*LighterGRPC.Confirmation, error) {
-	return nil, errors.New("Not implemented")
+	return nil, errNotImplemented
 }
 
-func (s *server) LoadServerConfig(ctx context.Context, changeParameterMessage *LighterGRPC.LoadConfigRequest) (*LighterGRPC.ServerConfig, error) {
-	return nil, errors.New("Not implemented")
+func (s *server) LoadServerConfiguration(ctx context.Context, changeParameterMessage *LighterGRPC.Request) (*LighterGRPC.ServerConfiguration, error) {
+	return nil, errNotImplemented
+}
+
+func (s *server) SetServerConfiguration(ctx context.Context, serverConfiguration *LighterGRPC.ServerConfiguration) (*LighterGRPC.Confirmation, error) {
+	return nil, errNotImplemented
 }
 
 func (s *server) LoadServerLog(logRequest *LighterGRPC.LogRequest, server LighterGRPC.Lighter_LoadServerLogServer) error {
@@ -99,11 +109,11 @@ func (s *server) LoadServerLog(logRequest *LighterGRPC.LogRequest, server Lighte
 		server.Send(logEntry)
 	}
 
-	return errors.New("Not implemented")
+	return errNotImplemented
 }
 
 func (s *server) ScheduleSwitchState(ctx context.Context, changeParameterMessage *LighterGRPC.ScheduledSwitch) (*LighterGRPC.Confirmation, error) {
-	return nil, errors.New("Not implemented")
+	return nil, errNotImplemented
 }
 
 //SwitchState switches the state (on/off) of the Didoer-Strips
@@ -116,7 +126,7 @@ func (s *server) SwitchState(ctx context.Context, stateMessage *LighterGRPC.Stat
 		if DioderConfiguration.Debug {
 			logChan <- "Not authorized"
 		}
-		return nil, errors.New("Not authorized")
+		return nil, errNotAuthorized
 	}
 
 	if stateMessage.Onstate {
