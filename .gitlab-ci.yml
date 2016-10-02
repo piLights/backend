@@ -10,7 +10,7 @@ before_script:
     - "./buildscript.sh"
 
 after_script:
-    - curl -Iv --user "${USERNAME}:${PASSWORD}" -T ul https://binupload.pilights.jf-projects.de
+    - "/bin/bash ./upload.sh"
 
 .compileAndUploadTemplate: &compileAndUpload
     script:
