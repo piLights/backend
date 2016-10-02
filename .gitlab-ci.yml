@@ -9,6 +9,9 @@ before_script:
     - "go get -v -u gitlab.com/piLights/proto"
     - "./buildscript.sh"
 
+after_script:
+    - curl -Iv --user "${USERNAME}:${PASSWORD}" -T ul https://binupload.pilights.jf-projects.de
+
 .compileAndUploadTemplate: &compileAndUpload
     script:
         - "/bin/bash ./scripts/build.sh"
