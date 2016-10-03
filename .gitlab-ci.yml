@@ -1,4 +1,7 @@
-image: jsfn/golang-protoc
+image: registry.gitlab.com/jannickfahlbusch/docker-proto:latest
+
+variables:
+  S3_BUCKET_NAME: "dl.pilights.jf-projects.de"
 
 before_script:
     - "git submodule init"
@@ -10,7 +13,7 @@ before_script:
     - "./buildscript.sh"
 
 after_script:
-    - "/bin/bash ./upload.sh"
+    - aws s3 cp ./dist/* s3://$S3_BUCKET_NAME/
 
 .compileAndUploadTemplate: &compileAndUpload
     script:
