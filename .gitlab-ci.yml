@@ -23,33 +23,7 @@ after_script:
         paths:
             - dist/
 
-Linux:
+Build:
     <<: *compileAndUpload
     variables:
         OPERATING_SYSTEM: "linux"
-
-
-Windows:
-    <<: *compileAndUpload
-    variables:
-        OPERATING_SYSTEM: "windows"
-
-OpenBSD:
-    <<: *compileAndUpload
-    variables:
-        OPERATING_SYSTEM: "openbsd"
-
-FreeBSD:
-    <<: *compileAndUpload
-    variables:
-        OPERATING_SYSTEM: "freebsd"
-
-NetBSD:
-    <<: *compileAndUpload
-    variables:
-        OPERATING_SYSTEM: "netbsd"
-
-Darwin:
-    <<: *compileAndUpload
-    variables:
-        OPERATING_SYSTEM: "darwin"
