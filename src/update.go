@@ -10,7 +10,7 @@ import (
 )
 
 //UPDATEURL is the URL from which the updates for the OS and architecture are fetched from
-const UPDATEURL = "https://github.com/piLights/dioder-rpc/releases/download/pre-release/dioderAPI_" + runtime.GOOS + "_" + runtime.GOARCH
+const UPDATEURL = "http://dl.pilights.jf-projects.de/dioderAPI_" + runtime.GOOS + "_" + runtime.GOARCH
 
 //startUpdate starts the updateProcess
 func startUpdate() {
