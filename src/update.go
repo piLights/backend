@@ -1,10 +1,8 @@
 package main
 
 import (
-	"crypto"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"runtime"
@@ -35,7 +33,7 @@ func startUpdate() {
 //updateBinary updates the executable binary
 func updateBinary(url string) error {
 	// Fetch the Hash-Sum
-	checksumResponse, error := http.Get(url + ".sha256")
+	/*checksumResponse, error := http.Get(url + ".sha256")
 	if error != nil {
 		return error
 	}
@@ -44,6 +42,11 @@ func updateBinary(url string) error {
 	if checksumResponse.StatusCode != 200 {
 		return errFileNoFound
 	}
+
+	checksum, error := ioutil.ReadAll(checksumResponse.Body)
+	if error != nil {
+	return error
+	}*/
 
 	// request the new file
 	response, error := http.Get(url)
@@ -56,14 +59,8 @@ func updateBinary(url string) error {
 		return errFileNoFound
 	}
 
-	checksum, error := ioutil.ReadAll(checksumResponse.Body)
-	if error != nil {
-		return error
-	}
-
 	error = update.Apply(response.Body, update.Options{
-		Hash:     crypto.SHA256, // this is the default, you don't need to specify it
-		Checksum: checksum,
+	//Checksum: checksum,
 	})
 	if error != nil {
 		rollbackError := update.RollbackError(error)
