@@ -33,17 +33,19 @@ func loggingService(logChan, fatalChan chan interface{}) {
 
 		select {
 		case logLine := <-logChan:
+			saveLog(logLine)
 			logInstance.Println(logLine)
 		case failureLogLine := <-fatalChan:
+			saveLog(failureLogLine)
 			logInstance.Fatalln(failureLogLine)
 		}
 	}
 }
 
-func saveLog(line string) {
+func saveLog(line interface{}) {
 	entry := &LighterGRPC.LogEntry{
 		Time:    time.Now().UnixNano(),
-		Message: line,
+		Message: line.(string), // @ToDo: Maybe fmt.Sprintf(line) would be better
 	}
 
 	logList.EntryList = append(logList.EntryList, entry)
