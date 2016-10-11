@@ -18,5 +18,9 @@ if [ ! -z ${CI_BUILD_REF+x} ]; then
 	sed -i -e "s/debugVersion/$CI_BUILD_REF/g" src/*.go
 fi
 
+if [ ! -z ${TRAVIS_COMMIT+x} ]; then
+	sed -i -e "s/debugVersion/$TRAVIS_COMMIT/g" src/*.go
+fi
+
 go build -o builds/dioderAPI_x86 -v src/*.go
 env GOOS=linux GOARCH=arm go build -o builds/dioderAPI_arm -v src/*.go
