@@ -106,10 +106,13 @@ func (s *server) SetServerConfiguration(ctx context.Context, serverConfiguration
 
 func (s *server) LoadServerLog(logRequest *LighterGRPC.LogRequest, server LighterGRPC.Lighter_LoadServerLogServer) error {
 	for _, logEntry := range getLogEntryList().EntryList {
-		server.Send(logEntry)
+		error := server.Send(logEntry)
+		if error != nil {
+			return error
+		}
 	}
 
-	return errNotImplemented
+	return nil
 }
 
 func (s *server) ScheduleSwitchState(ctx context.Context, changeParameterMessage *LighterGRPC.ScheduledSwitch) (*LighterGRPC.Confirmation, error) {
