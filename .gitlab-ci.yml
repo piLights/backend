@@ -14,7 +14,6 @@ before_script:
 
 after_script:
     - "/bin/bash ./scripts/generateHashsums.sh"
-    - aws s3 cp dist s3://$S3_BUCKET_NAME/ --recursive --region eu-central-1
 
 .compileAndUploadTemplate: &compileAndUpload
     script:
