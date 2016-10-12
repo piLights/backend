@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"os/exec"
 	"strconv"
 	"strings"
 	"unicode"
@@ -53,28 +54,38 @@ func removeWhitespaces(str string) string {
 
 //startServer starts the GRPC-server and binds to the defined address
 func startAutoConfigurationServer() {
-	if DioderConfiguration.Debug {
-		logChan <- fmt.Sprintf("Binding to %s", DioderConfiguration.BindTo)
-	}
 
 	_, port, error := net.SplitHostPort(DioderConfiguration.BindTo)
 	if error != nil {
 		log.Fatal(error)
 	}
 
-	//Publish the ServerName
-	publishRecord(`_dioder._tcp.local. 10 IN TXT "` + DioderConfiguration.ServerName + `"`)
+	if DioderConfiguration.UseAvahi {
+		// os Exec avahi-publish-service -s dioderServer _dioder._tcp 13337
+		_, err := exec.Command("avahi-publish-service", "-s", DioderConfiguration.ServerName, "_dioder._tcp", port).Output()
+		if err != nil {
+			fatalChan <- err
+		}
+	} else {
 
-	//Register _dioder._tcp on the local mDNS domain
-	publishRecord("_services._dns-sd._udp.local. 10 IN PTR _dioder._tcp.local.")
+		if DioderConfiguration.Debug {
+			logChan <- fmt.Sprintf("Binding to %s", DioderConfiguration.BindTo)
+		}
 
-	cleanHostName := removeWhitespaces(DioderConfiguration.ServerName)
-	//A record for servername.local for every IPv4 address
-	//AAAA record for serverName.local for every IPv6 address
-	publishARecords(cleanHostName)
+		//Publish the ServerName
+		publishRecord(`_dioder._tcp.local. 10 IN TXT "` + DioderConfiguration.ServerName + `"`)
 
-	// SRV -> _dioder._tcp.local 10 IN SRV 0 0 PORT HOST
-	createSRVRecord(cleanHostName, port)
+		//Register _dioder._tcp on the local mDNS domain
+		publishRecord("_services._dns-sd._udp.local. 10 IN PTR _dioder._tcp.local.")
+
+		cleanHostName := removeWhitespaces(DioderConfiguration.ServerName)
+		//A record for servername.local for every IPv4 address
+		//AAAA record for serverName.local for every IPv6 address
+		publishARecords(cleanHostName)
+
+		// SRV -> _dioder._tcp.local 10 IN SRV 0 0 PORT HOST
+		createSRVRecord(cleanHostName, port)
+	}
 }
 
 //publishARecords publishes an A or AAAA record on the given hostname with every interface-address

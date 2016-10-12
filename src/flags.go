@@ -77,4 +77,9 @@ var applicationFlags = []cli.Flag{
 		Usage:       "Enables only IPv6",
 		Destination: &DioderConfiguration.IPv6Only,
 	},
+	cli.BoolFlag{
+		Name:        "useAvahi",
+		Usage:       "Uses Avahi to serve mDNS",
+		Destination: &DioderConfiguration.UseAvahi,
+	},
 }

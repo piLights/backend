@@ -19,6 +19,7 @@ type Configuration struct {
 	ServerName        string
 	IPv4Only          bool
 	IPv6Only          bool
+	UseAvahi          bool
 }
 
 var DioderConfiguration Configuration
