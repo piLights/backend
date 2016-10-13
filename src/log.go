@@ -46,7 +46,7 @@ func loggingService(logChan, fatalChan chan interface{}) {
 func saveLog(line interface{}) {
 	entry := &LighterGRPC.LogEntry{
 		Time:    time.Now().UnixNano(),
-		Message: fmt.Sprintln(line), // Fix: Type assertions failing here: We have string and *grpc.error
+		Message: fmt.Sprintf("%v", line), // Fix: Type assertions failing here: We have string and *grpc.error
 	}
 
 	logList.EntryList = append(logList.EntryList, entry)
