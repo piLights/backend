@@ -7,6 +7,9 @@ import (
 	"os"
 	"os/signal"
 
+	"gitlab.com/piLights/dioder-rpc/src/configuration"
+	"gitlab.com/piLights/dioder-rpc/src/webpage"
+
 	"github.com/piLights/dioder"
 	"github.com/urfave/cli"
 )
@@ -14,9 +17,8 @@ import (
 const version = "debugVersion"
 
 var (
-	dioderInstance dioder.Dioder
-	logChan        chan interface{}
-	fatalChan      chan interface{}
+	logChan   chan interface{}
+	fatalChan chan interface{}
 )
 
 func main() {
@@ -44,11 +46,12 @@ func main() {
 		}
 
 		if c.String("configurationFile") != "" {
-			error := NewConfiguration(c.String("configurationFile"))
-
-			if error != nil {
-				return error
+			config, err := configuration.NewConfiguration(c.String("configurationFile"))
+			if err != nil {
+				return err
 			}
+
+			DioderConfiguration = config
 		}
 
 		//Set the pins
@@ -60,7 +63,7 @@ func main() {
 			go startAutoConfigurationServer()
 		}
 
-		dioderInstance = dioder.New(dioder.Pins{Red: DioderConfiguration.Pins.Red, Green: DioderConfiguration.Pins.Green, Blue: DioderConfiguration.Pins.Blue}, DioderConfiguration.PiBlaster)
+		DioderConfiguration.DioderInstance = dioder.New(dioder.Pins{Red: DioderConfiguration.Pins.Red, Green: DioderConfiguration.Pins.Green, Blue: DioderConfiguration.Pins.Blue}, DioderConfiguration.PiBlaster)
 
 		//Handle CTRL  + C
 		osSignalChan := make(chan os.Signal, 1)
@@ -75,14 +78,18 @@ func main() {
 			close(fatalChan)
 
 			// Release all Pins for further use
-			dioderInstance.Release()
+			DioderConfiguration.DioderInstance.Release()
 
 			os.Exit(0)
 		}()
 
+		if DioderConfiguration.Debug {
+			go webpage.StartWebPage(logChan, fatalChan, DioderConfiguration)
+		}
+
 		startServer()
 
-		defer dioderInstance.Release()
+		defer DioderConfiguration.DioderInstance.Release()
 
 		return nil
 	}

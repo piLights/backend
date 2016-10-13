@@ -48,7 +48,7 @@ func (s *server) SetColor(ctx context.Context, colorMessage *LighterGRPC.ColorMe
 
 	colorSet := color.RGBA{red, green, blue, opacity}
 
-	dioderInstance.SetAll(colorSet)
+	DioderConfiguration.DioderInstance.SetAll(colorSet)
 
 	if len(streams) > 0 {
 		if DioderConfiguration.Debug {
@@ -73,7 +73,7 @@ func (s *server) CheckConnection(request *LighterGRPC.Request, stream LighterGRP
 		return error
 	}
 
-	colorSet := dioderInstance.GetCurrentColor()
+	colorSet := DioderConfiguration.DioderInstance.GetCurrentColor()
 
 	if DioderConfiguration.Debug {
 		logChan <- fmt.Sprint("CheckConnection: Returning the current settings:", colorSet)
@@ -139,9 +139,9 @@ func (s *server) SwitchState(ctx context.Context, stateMessage *LighterGRPC.Stat
 	}
 
 	if stateMessage.Onstate {
-		dioderInstance.TurnOn()
+		DioderConfiguration.DioderInstance.TurnOn()
 	} else {
-		dioderInstance.TurnOff()
+		DioderConfiguration.DioderInstance.TurnOff()
 	}
 
 	onState = stateMessage.Onstate
