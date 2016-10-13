@@ -68,6 +68,12 @@ func main() {
 		go func() {
 			<-osSignalChan
 
+			// Close channels
+			close(osSignalChan)
+			close(logChan)
+			close(fatalChan)
+
+			// Release all Pins for further use
 			dioderInstance.Release()
 
 			os.Exit(0)
