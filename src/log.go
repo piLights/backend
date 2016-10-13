@@ -5,6 +5,7 @@ import (
 	"log"
 	"math"
 	"os"
+	"sync"
 	"time"
 
 	"gitlab.com/piLights/proto"
@@ -15,11 +16,14 @@ const maxSliceSize = math.MaxInt32
 type logEntryList struct {
 	EntryList []*LighterGRPC.LogEntry
 	Count     int32
+	mutex     sync.Mutex
 }
 
 var logList logEntryList
 
 func getLogEntryList(amount int32) []*LighterGRPC.LogEntry {
+	logList.mutex.Lock()
+	defer logList.mutex.Unlock()
 	if amount >= logList.Count {
 		return logList.EntryList
 	}
@@ -51,6 +55,8 @@ func loggingService(logChan, fatalChan chan interface{}) {
 }
 
 func saveLog(line interface{}) {
+	logList.mutex.Lock()
+	defer logList.mutex.Unlock()
 	// Check if the push of another entry would cause the EntryList-Slice to overflow
 	if logList.Count+1 > maxSliceSize {
 		// Remove the first item
