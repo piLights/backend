@@ -14,13 +14,17 @@ const maxSliceSize = math.MaxInt32
 
 type logEntryList struct {
 	EntryList []*LighterGRPC.LogEntry
-	Count     int
+	Count     int32
 }
 
 var logList logEntryList
 
-func getLogEntryList() logEntryList {
-	return logList
+func getLogEntryList(amount int32) []*LighterGRPC.LogEntry {
+	if amount >= logList.Count {
+		return logList.EntryList
+	}
+
+	return logList.EntryList[logList.Count-amount:]
 }
 
 func loggingService(logChan, fatalChan chan interface{}) {
