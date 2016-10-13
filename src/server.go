@@ -21,6 +21,8 @@ var (
 
 	onState bool
 
+	colorStream chan *LighterGRPC.ColorMessage
+
 	//Errors
 	errNotAuthorized  = errors.New("Not authorized")
 	errNotImplemented = errors.New("Not implemented")
@@ -48,14 +50,11 @@ func (s *server) SetColor(ctx context.Context, colorMessage *LighterGRPC.ColorMe
 
 	dioderInstance.SetAll(colorSet)
 
-	for deviceID, stream := range streams {
-		if deviceID != colorMessage.DeviceID {
-			if DioderConfiguration.Debug {
-				logChan <- fmt.Sprintf("Sending the colormessage to remote device %s\n", deviceID)
-			}
-
-			stream.Send(colorMessage)
+	if len(streams) > 0 {
+		if DioderConfiguration.Debug {
+			logChan <- fmt.Sprintf("Sending the colormessage to all remote devices")
 		}
+		colorStream <- colorMessage
 	}
 
 	return &LighterGRPC.Confirmation{Success: true}, nil
@@ -87,6 +86,13 @@ func (s *server) CheckConnection(request *LighterGRPC.Request, stream LighterGRP
 	error := stream.Send(&LighterGRPC.ColorMessage{onState, int32(colorSet.R), int32(colorSet.G), int32(colorSet.B), int32(colorSet.A), "Dioder-Server", ""})
 	if error != nil && DioderConfiguration.Debug {
 		logChan <- error
+	}
+
+	for colorMessage := range colorStream {
+		error = stream.Send(colorMessage)
+		if error != nil && DioderConfiguration.Debug {
+			logChan <- error
+		}
 	}
 
 	return error
@@ -151,6 +157,7 @@ func startServer() {
 
 	//Initialize the streams-map
 	streams = make(map[string]LighterGRPC.Lighter_CheckConnectionServer)
+	colorStream = make(chan *LighterGRPC.ColorMessage)
 
 	protocol := "tcp"
 

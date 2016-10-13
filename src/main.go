@@ -69,6 +69,7 @@ func main() {
 			<-osSignalChan
 
 			// Close channels
+			close(colorStream)
 			close(osSignalChan)
 			close(logChan)
 			close(fatalChan)
