@@ -1,7 +1,7 @@
 package webpage
 
 import (
-	"log"
+	"fmt"
 	"net/http"
 	"time"
 )
@@ -12,8 +12,8 @@ func Logging(inner http.Handler, name string) http.Handler {
 
 		inner.ServeHTTP(w, r)
 
-		if dioder.Debug {
-			logChan <- log.Sprintf(
+		if dioderConfiguration.Debug {
+			logChan <- fmt.Sprintf(
 				"%s\t%s\t%s\t%s",
 				r.Method,
 				r.RequestURI,
