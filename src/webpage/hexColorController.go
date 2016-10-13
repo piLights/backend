@@ -5,7 +5,7 @@ import (
 	"image/color"
 	"net/http"
 
-	sadboxColor "code.google.com/p/sadbox/color"
+	sadboxColor "gitlab.com/jannickfahlbusch/color"
 
 	"github.com/gorilla/mux"
 )
