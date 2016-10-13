@@ -82,4 +82,9 @@ var applicationFlags = []cli.Flag{
 		Usage:       "Uses Avahi to serve mDNS",
 		Destination: &DioderConfiguration.UseAvahi,
 	},
+	cli.BoolFlag{
+		Name:        "noAutoconfiguration",
+		Usage:       "Disables the autoconfiguration",
+		Destination: &DioderConfiguration.NoAutoconfiguration,
+	},
 }

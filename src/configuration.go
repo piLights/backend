@@ -9,17 +9,18 @@ import (
 )
 
 type Configuration struct {
-	BindTo            string
-	Pins              dioder.Pins
-	Debug             bool
-	UpdateURL         string
-	ConfigurationFile string
-	Password          string
-	PiBlaster         string
-	ServerName        string
-	IPv4Only          bool
-	IPv6Only          bool
-	UseAvahi          bool
+	BindTo              string
+	ConfigurationFile   string
+	Debug               bool
+	IPv4Only            bool
+	IPv6Only            bool
+	NoAutoconfiguration bool
+	Password            string
+	PiBlaster           string
+	Pins                dioder.Pins
+	ServerName          string
+	UpdateURL           string
+	UseAvahi            bool
 }
 
 var DioderConfiguration Configuration

@@ -56,7 +56,9 @@ func main() {
 			logChan <- fmt.Sprintf("Configuring the Pins to: Red: %s, Green: %s, Blue: %s", DioderConfiguration.Pins.Red, DioderConfiguration.Pins.Green, DioderConfiguration.Pins.Blue)
 		}
 
-		go startAutoConfigurationServer()
+		if !DioderConfiguration.NoAutoconfiguration {
+			go startAutoConfigurationServer()
+		}
 
 		dioderInstance = dioder.New(dioder.Pins{Red: DioderConfiguration.Pins.Red, Green: DioderConfiguration.Pins.Green, Blue: DioderConfiguration.Pins.Blue}, DioderConfiguration.PiBlaster)
 
