@@ -34,10 +34,7 @@ func (s *server) SetColor(ctx context.Context, colorMessage *LighterGRPC.ColorMe
 		logChan <- fmt.Sprint("SetColor:", colorMessage)
 	}
 
-	if DioderConfiguration.Password != "" && DioderConfiguration.Password != colorMessage.Password {
-		if DioderConfiguration.Debug {
-			logChan <- "Not authorized"
-		}
+	if !checkAccess(colorMessage) {
 		return nil, errNotAuthorized
 	}
 
@@ -65,12 +62,8 @@ func (s *server) CheckConnection(request *LighterGRPC.Request, stream LighterGRP
 		logChan <- fmt.Sprint("CheckConnection", request)
 	}
 
-	if DioderConfiguration.Password != "" && DioderConfiguration.Password != request.Password {
-		error := errNotAuthorized
-		if DioderConfiguration.Debug {
-			logChan <- error
-		}
-		return error
+	if !checkAccess(request) {
+		return errNotAuthorized
 	}
 
 	colorSet := DioderConfiguration.DioderInstance.GetCurrentColor()
@@ -150,15 +143,12 @@ func (s *server) SwitchState(ctx context.Context, stateMessage *LighterGRPC.Stat
 }
 
 func (s *server) Version(ctx context.Context, request *LighterGRPC.Request) (*LighterGRPC.BackendVersion, error) {
-	if DioderConfiguration.Password != "" && DioderConfiguration.Password != stateMessage.Password {
-		if DioderConfiguration.Debug {
-			logChan <- "Not authorized"
-		}
+	if !checkAccess(request) {
 		return nil, errNotAuthorized
 	}
 
-	return *LighterGRPC.BackendVersion{
-		Version:         version,
+	return &LighterGRPC.BackendVersion{
+		VersionCode:     version,
 		UpdateAvailable: false, // @ToDo!
 	}, nil
 }
@@ -203,4 +193,15 @@ func startServer() {
 	fmt.Printf("Listening on %s...\n", DioderConfiguration.BindTo)
 
 	grpcServer.Serve(listener)
+}
+
+func checkAccess(request interface{}) bool {
+	if DioderConfiguration.Password != "" && DioderConfiguration.Password != request.(struct{ Password string }).Password {
+		if DioderConfiguration.Debug {
+			logChan <- "Not authorized"
+		}
+		return false
+	}
+
+	return true
 }
