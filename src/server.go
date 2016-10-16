@@ -149,6 +149,20 @@ func (s *server) SwitchState(ctx context.Context, stateMessage *LighterGRPC.Stat
 	return &LighterGRPC.Confirmation{Success: true}, nil
 }
 
+func (s *server) Version(ctx context.Context, request *LighterGRPC.Request) (*LighterGRPC.BackendVersion, error) {
+	if DioderConfiguration.Password != "" && DioderConfiguration.Password != stateMessage.Password {
+		if DioderConfiguration.Debug {
+			logChan <- "Not authorized"
+		}
+		return nil, errNotAuthorized
+	}
+
+	return *LighterGRPC.BackendVersion{
+		Version:         version,
+		UpdateAvailable: false, // @ToDo!
+	}, nil
+}
+
 //startServer starts the GRPC-server and binds to the defined address
 func startServer() {
 	if DioderConfiguration.Debug {
