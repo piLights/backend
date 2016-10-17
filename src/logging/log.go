@@ -1,4 +1,4 @@
-package main
+package logging
 
 import (
 	"fmt"
@@ -8,6 +8,7 @@ import (
 	"sync"
 	"time"
 
+	"gitlab.com/piLights/dioder-rpc/src/configuration"
 	"gitlab.com/piLights/proto"
 )
 
@@ -21,7 +22,16 @@ type logEntryList struct {
 
 var logList logEntryList
 
-func getLogEntryList(amount int32) []*LighterGRPC.LogEntry {
+var (
+	// FatalChan is the channel used for fatal errors
+	FatalChan chan interface{}
+
+	// LogChan is the channel used for anything related to logging
+	LogChan chan interface{}
+)
+
+// GetLogEntryList fetches the list of LogEntries
+func GetLogEntryList(amount int32) []*LighterGRPC.LogEntry {
 	logList.mutex.Lock()
 	defer logList.mutex.Unlock()
 	if amount >= logList.Count {
@@ -31,12 +41,18 @@ func getLogEntryList(amount int32) []*LighterGRPC.LogEntry {
 	return logList.EntryList[logList.Count-amount:]
 }
 
-func loggingService(logChan, fatalChan chan interface{}) {
+// NewLoggingService instanciates a new logging service
+func NewLoggingService() {
+	FatalChan = make(chan interface{}, 100)
+	LogChan = make(chan interface{}, 100)
+}
+
+func Service() {
 	//Ldate | Ltime | Lmicroseconds | Llongfile
 	//Open
 
-	if DioderConfiguration.Debug {
-		logChan <- "Starting the logging service."
+	if configuration.DioderConfiguration.Debug {
+		LogChan <- "Starting the logging service."
 	}
 
 	logInstance := log.New(os.Stdout, "", log.Ldate|log.Ltime|log.LstdFlags)
@@ -44,10 +60,10 @@ func loggingService(logChan, fatalChan chan interface{}) {
 	for {
 
 		select {
-		case logLine := <-logChan:
+		case logLine := <-LogChan:
 			saveLog(logLine)
 			logInstance.Println(logLine)
-		case failureLogLine := <-fatalChan:
+		case failureLogLine := <-FatalChan:
 			saveLog(failureLogLine)
 			logInstance.Fatalln(failureLogLine)
 		}

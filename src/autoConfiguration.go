@@ -10,6 +10,9 @@ import (
 	"strings"
 	"unicode"
 
+	"gitlab.com/piLights/dioder-rpc/src/configuration"
+	"gitlab.com/piLights/dioder-rpc/src/logging"
+
 	"github.com/davecheney/mdns"
 )
 
@@ -55,30 +58,30 @@ func removeWhitespaces(str string) string {
 //startServer starts the GRPC-server and binds to the defined address
 func startAutoConfigurationServer() {
 
-	_, port, error := net.SplitHostPort(DioderConfiguration.BindTo)
+	_, port, error := net.SplitHostPort(configuration.DioderConfiguration.BindTo)
 	if error != nil {
 		log.Fatal(error)
 	}
 
-	if DioderConfiguration.UseAvahi {
+	if configuration.DioderConfiguration.UseAvahi {
 		// os Exec avahi-publish-service -s dioderServer _dioder._tcp 13337
-		_, err := exec.Command("avahi-publish-service", "-s", DioderConfiguration.ServerName, "_dioder._tcp", port).Output()
+		_, err := exec.Command("avahi-publish-service", "-s", configuration.DioderConfiguration.ServerName, "_dioder._tcp", port).Output()
 		if err != nil {
-			fatalChan <- err
+			logging.FatalChan <- err
 		}
 	} else {
 
-		if DioderConfiguration.Debug {
-			logChan <- fmt.Sprintf("Binding to %s", DioderConfiguration.BindTo)
+		if configuration.DioderConfiguration.Debug {
+			logging.LogChan <- fmt.Sprintf("Binding to %s", configuration.DioderConfiguration.BindTo)
 		}
 
 		//Publish the ServerName
-		publishRecord(`_dioder._tcp.local. 10 IN TXT "` + DioderConfiguration.ServerName + `"`)
+		publishRecord(`_dioder._tcp.local. 10 IN TXT "` + configuration.DioderConfiguration.ServerName + `"`)
 
 		//Register _dioder._tcp on the local mDNS domain
 		publishRecord("_services._dns-sd._udp.local. 10 IN PTR _dioder._tcp.local.")
 
-		cleanHostName := removeWhitespaces(DioderConfiguration.ServerName)
+		cleanHostName := removeWhitespaces(configuration.DioderConfiguration.ServerName)
 		//A record for servername.local for every IPv4 address
 		//AAAA record for serverName.local for every IPv6 address
 		publishARecords(cleanHostName)
@@ -100,12 +103,12 @@ func publishARecords(hostName string) {
 		if ok && !ipnet.IP.IsLoopback() {
 			if ipnet.IP.String() != "" {
 				// Do not publish IPv4 records if IPv4 is disabled
-				if DioderConfiguration.IPv4Only && ipnet.IP.To4() == nil {
+				if configuration.DioderConfiguration.IPv4Only && ipnet.IP.To4() == nil {
 					continue
 				}
 
 				// Do not publish IPv6 records if IPv6 is disabled
-				if DioderConfiguration.IPv6Only && ipnet.IP.To4() != nil {
+				if configuration.DioderConfiguration.IPv6Only && ipnet.IP.To4() != nil {
 					continue
 				}
 
@@ -139,8 +142,8 @@ func createSRVRecord(hostName, port string) {
 
 //publishRecord publishes an record
 func publishRecord(resourceRecord string) {
-	if DioderConfiguration.Debug {
-		logChan <- fmt.Sprintf("Setting resourceRecord: %s", resourceRecord)
+	if configuration.DioderConfiguration.Debug {
+		logging.LogChan <- fmt.Sprintf("Setting resourceRecord: %s", resourceRecord)
 	}
 
 	error := mdns.Publish(resourceRecord)

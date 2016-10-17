@@ -8,6 +8,7 @@ import (
 	"github.com/piLights/dioder"
 )
 
+// Configuration represents the configuration of the backend
 type Configuration struct {
 	BindTo              string
 	ConfigurationFile   string
@@ -25,6 +26,10 @@ type Configuration struct {
 	DioderInstance dioder.Dioder `json:"-"`
 }
 
+// DioderConfiguration helds the Configuration
+var DioderConfiguration Configuration
+
+// WriteConfigurationToFile writes the Configuration to the given path
 func (config *Configuration) WriteConfigurationToFile(fileName string) error {
 
 	serializedConfiguration, error := json.Marshal(config)
@@ -37,8 +42,8 @@ func (config *Configuration) WriteConfigurationToFile(fileName string) error {
 	return error
 }
 
+// NewConfiguration loads the Configuration from the given location or returns a new one
 func NewConfiguration(fileName string) (Configuration, error) {
-	var DioderConfiguration Configuration
 	if fileName == "" {
 		DioderConfiguration = Configuration{}
 		return DioderConfiguration, nil

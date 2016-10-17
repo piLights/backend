@@ -7,6 +7,9 @@ import (
 	"net/http"
 	"runtime"
 
+	"gitlab.com/piLights/dioder-rpc/src/configuration"
+	"gitlab.com/piLights/dioder-rpc/src/logging"
+
 	"github.com/inconshreveable/go-update"
 )
 
@@ -18,10 +21,10 @@ var errFileNoFound = errors.New("File not found")
 //startUpdate starts the updateProcess
 func startUpdate() {
 	fmt.Println("Starting update...")
-	if DioderConfiguration.Debug {
-		logChan <- fmt.Sprintf("Downloading from %s\n", DioderConfiguration.UpdateURL)
+	if configuration.DioderConfiguration.Debug {
+		logging.LogChan <- fmt.Sprintf("Downloading from %s\n", configuration.DioderConfiguration.UpdateURL)
 	}
-	error := updateBinary(DioderConfiguration.UpdateURL)
+	error := updateBinary(configuration.DioderConfiguration.UpdateURL)
 	if error != nil {
 		fmt.Println("Updating failed!")
 		log.Fatal(error)

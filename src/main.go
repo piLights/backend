@@ -8,29 +8,24 @@ import (
 	"os/signal"
 
 	"gitlab.com/piLights/dioder-rpc/src/configuration"
+	"gitlab.com/piLights/dioder-rpc/src/logging"
+	"gitlab.com/piLights/dioder-rpc/src/piLightsVersion"
+	"gitlab.com/piLights/dioder-rpc/src/rpc"
 	"gitlab.com/piLights/dioder-rpc/src/webpage"
 
 	"github.com/piLights/dioder"
 	"github.com/urfave/cli"
 )
 
-const version = "debugVersion"
-
-var (
-	logChan   chan interface{}
-	fatalChan chan interface{}
-)
-
 func main() {
 	application := cli.NewApp()
 	application.Name = "Dioder-Server"
-	application.Version = version
+	application.Version = piLightsVersion.Version
 	application.Flags = applicationFlags
 
 	application.Action = func(c *cli.Context) error {
-		logChan = make(chan interface{}, 100)
-		fatalChan = make(chan interface{}, 100)
-		go loggingService(logChan, fatalChan)
+		logging.NewLoggingService()
+		go logging.Service()
 
 		//Check, if we should update
 		if c.Bool("update") {
@@ -39,8 +34,8 @@ func main() {
 		}
 
 		if c.String("writeConfiguration") != "" {
-			fmt.Println(DioderConfiguration)
-			error := DioderConfiguration.WriteConfigurationToFile(c.String("writeConfiguration"))
+			fmt.Println(configuration.DioderConfiguration)
+			error := configuration.DioderConfiguration.WriteConfigurationToFile(c.String("writeConfiguration"))
 
 			return error
 		}
@@ -51,19 +46,19 @@ func main() {
 				return err
 			}
 
-			DioderConfiguration = config
+			configuration.DioderConfiguration = config
 		}
 
 		//Set the pins
-		if DioderConfiguration.Debug {
-			logChan <- fmt.Sprintf("Configuring the Pins to: Red: %s, Green: %s, Blue: %s", DioderConfiguration.Pins.Red, DioderConfiguration.Pins.Green, DioderConfiguration.Pins.Blue)
+		if configuration.DioderConfiguration.Debug {
+			logging.LogChan <- fmt.Sprintf("Configuring the Pins to: Red: %s, Green: %s, Blue: %s", configuration.DioderConfiguration.Pins.Red, configuration.DioderConfiguration.Pins.Green, configuration.DioderConfiguration.Pins.Blue)
 		}
 
-		if !DioderConfiguration.NoAutoconfiguration {
+		if !configuration.DioderConfiguration.NoAutoconfiguration {
 			go startAutoConfigurationServer()
 		}
 
-		DioderConfiguration.DioderInstance = dioder.New(dioder.Pins{Red: DioderConfiguration.Pins.Red, Green: DioderConfiguration.Pins.Green, Blue: DioderConfiguration.Pins.Blue}, DioderConfiguration.PiBlaster)
+		configuration.DioderConfiguration.DioderInstance = dioder.New(dioder.Pins{Red: configuration.DioderConfiguration.Pins.Red, Green: configuration.DioderConfiguration.Pins.Green, Blue: configuration.DioderConfiguration.Pins.Blue}, configuration.DioderConfiguration.PiBlaster)
 
 		//Handle CTRL  + C
 		osSignalChan := make(chan os.Signal, 1)
@@ -72,24 +67,23 @@ func main() {
 			<-osSignalChan
 
 			// Close channels
-			close(colorStream)
 			close(osSignalChan)
-			close(logChan)
-			close(fatalChan)
+			close(logging.LogChan)
+			close(logging.FatalChan)
 
 			// Release all Pins for further use
-			DioderConfiguration.DioderInstance.Release()
+			configuration.DioderConfiguration.DioderInstance.Release()
 
 			os.Exit(0)
 		}()
 
-		if DioderConfiguration.Debug {
-			go webpage.StartWebPage(logChan, fatalChan, DioderConfiguration)
+		if configuration.DioderConfiguration.Debug {
+			go webpage.StartWebPage(logging.LogChan, logging.FatalChan, configuration.DioderConfiguration)
 		}
 
-		startServer()
+		rpc.StartServer()
 
-		defer DioderConfiguration.DioderInstance.Release()
+		defer configuration.DioderConfiguration.DioderInstance.Release()
 
 		return nil
 	}

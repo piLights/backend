@@ -15,11 +15,11 @@ mkdir builds
 # Replace the version-string
 #If exists
 if [ ! -z ${CI_BUILD_REF+x} ]; then
-	sed -i -e "s/debugVersion/$CI_BUILD_REF/g" src/*.go
+	find . -type f -name "*.go" | xargs sed -i -e "s/debugVersion/$CI_BUILD_REF/g"
 fi
 
 if [ ! -z ${TRAVIS_COMMIT+x} ]; then
-	sed -i -e "s/debugVersion/$TRAVIS_COMMIT/g" src/*.go
+    find . -type f -name "*.go" | xargs sed -i -e "s/debugVersion/$CI_BUILD_REF/g"
 fi
 
 go build -o builds/dioderAPI_x86 -v src/*.go
