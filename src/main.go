@@ -18,6 +18,9 @@ import (
 )
 
 func main() {
+	// Report crashes
+	//defer captureCrash()
+
 	application := cli.NewApp()
 	application.Name = "Dioder-Server"
 	application.Version = piLightsVersion.Version
