@@ -19,7 +19,7 @@ if [ ! -z ${CI_BUILD_REF+x} ]; then
 fi
 
 if [ ! -z ${TRAVIS_COMMIT+x} ]; then
-    find . -type f -name "*.go" | xargs sed -i -e "s/debugVersion/$CI_BUILD_REF/g"
+    find . -type f -name "*.go" | xargs sed -i -e "s/debugVersion/$TRAVIS_COMMIT/g"
 fi
 
 go build -o builds/dioderAPI_x86 -v src/*.go
