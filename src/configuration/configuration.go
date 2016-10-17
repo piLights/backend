@@ -15,7 +15,7 @@ type Configuration struct {
 	IPv4Only            bool
 	IPv6Only            bool
 	NoAutoconfiguration bool
-	Password            string
+	Password            string `json:"-"`
 	PiBlaster           string
 	Pins                dioder.Pins
 	ServerName          string
