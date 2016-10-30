@@ -12,7 +12,7 @@ var applicationFlags = []cli.Flag{
 	},
 	cli.StringFlag{
 		Name:        "configurationFile, c",
-		Usage:       "Path to the configuration-file",
+		Usage:       "Load configuration from `FILE`",
 		Destination: &configuration.DioderConfiguration.ConfigurationFile,
 	},
 	cli.BoolFlag{
