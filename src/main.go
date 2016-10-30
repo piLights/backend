@@ -11,7 +11,6 @@ import (
 	"gitlab.com/piLights/dioder-rpc/src/logging"
 	"gitlab.com/piLights/dioder-rpc/src/piLightsVersion"
 	"gitlab.com/piLights/dioder-rpc/src/rpc"
-	"gitlab.com/piLights/dioder-rpc/src/webpage"
 
 	"github.com/piLights/dioder"
 	"github.com/urfave/cli"
@@ -80,8 +79,8 @@ func main() {
 			os.Exit(0)
 		}()
 
-		if configuration.DioderConfiguration.Debug {
-			go webpage.StartWebPage(logging.LogChan, logging.FatalChan, configuration.DioderConfiguration)
+		if !configuration.DioderConfiguration.DisableAPI {
+			go startAPI()
 		}
 
 		rpc.StartServer()

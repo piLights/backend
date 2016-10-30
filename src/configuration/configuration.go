@@ -13,6 +13,7 @@ type Configuration struct {
 	BindTo              string
 	ConfigurationFile   string
 	Debug               bool
+	DisableAPI          bool
 	IPv4Only            bool
 	IPv6Only            bool
 	NoAutoconfiguration bool
