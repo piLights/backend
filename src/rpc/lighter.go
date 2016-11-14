@@ -42,7 +42,12 @@ func (s *lighterServer) SetColor(ctx context.Context, colorMessage *LighterGRPC.
 	green := uint8(colorMessage.G)
 	blue := uint8(colorMessage.B)
 
-	colorSet := color.RGBA{red, green, blue, opacity}
+	colorSet := color.RGBA{
+		R: red,
+		G: green,
+		B: blue,
+		A:opacity,
+	}
 
 	configuration.DioderConfiguration.DioderInstance.SetAll(colorSet)
 
