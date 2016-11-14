@@ -7,12 +7,12 @@ import (
 	"os"
 	"os/signal"
 
+	"gitlab.com/piLights/dioder"
 	"gitlab.com/piLights/dioder-rpc/src/configuration"
 	"gitlab.com/piLights/dioder-rpc/src/logging"
 	"gitlab.com/piLights/dioder-rpc/src/piLightsVersion"
 	"gitlab.com/piLights/dioder-rpc/src/rpc"
 
-	"github.com/piLights/dioder"
 	"github.com/urfave/cli"
 )
 

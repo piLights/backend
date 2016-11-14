@@ -21,7 +21,7 @@ const hexDigit = "0123456789abcdef"
 // reverseAddr returns the in-addr.arpa. or ip6.arpa. hostname of the IP
 // address suitable for reverse DNS (PTR) record lookups or an error if it fails
 // to parse the IP address. - this is from the oficial golang-code
-func reverseAddr(addr string) (arpa string, err error) {
+func reverseAddr(addr string) (string, error) {
 	ip := net.ParseIP(addr)
 	if ip == nil {
 		return "", errors.New("unrecognized address: " + addr)

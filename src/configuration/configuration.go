@@ -5,7 +5,7 @@ import (
 	"io/ioutil"
 	"os"
 
-	"github.com/piLights/dioder"
+	"gitlab.com/piLights/dioder"
 )
 
 // Configuration represents the configuration of the backend
