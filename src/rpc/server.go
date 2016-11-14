@@ -18,7 +18,7 @@ func StartServer() {
 	}
 
 	//Initialize the streams-map
-	streams = make(map[string]LighterGRPC.Lighter_CheckConnectionServer)
+	streams = make(map[string]LighterGRPC.Lighter_OpenStreamServer)
 	colorStream = make(chan *LighterGRPC.ColorMessage)
 
 	protocol := "tcp"

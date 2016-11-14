@@ -79,10 +79,6 @@ func main() {
 			os.Exit(0)
 		}()
 
-		if !configuration.DioderConfiguration.DisableAPI {
-			go startAPI()
-		}
-
 		rpc.StartServer()
 
 		defer configuration.DioderConfiguration.DioderInstance.Release()

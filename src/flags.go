@@ -90,9 +90,4 @@ var applicationFlags = []cli.Flag{
 		Usage:       "Disables the autoconfiguration",
 		Destination: &configuration.DioderConfiguration.NoAutoconfiguration,
 	},
-	cli.BoolFlag{
-		Name:        "disableAPI",
-		Usage:       "Disables the REST-API",
-		Destination: &configuration.DioderConfiguration.DisableAPI,
-	},
 }

@@ -16,7 +16,7 @@ type lighterServer struct{}
 
 var (
 	//Holds all streams
-	streams map[string]LighterGRPC.Lighter_CheckConnectionServer
+	streams map[string]LighterGRPC.Lighter_OpenStreamServer
 
 	onState bool
 
@@ -56,9 +56,9 @@ func (s *lighterServer) SetColor(ctx context.Context, colorMessage *LighterGRPC.
 	return &LighterGRPC.Confirmation{Success: true}, nil
 }
 
-func (s *lighterServer) CheckConnection(request *LighterGRPC.Request, stream LighterGRPC.Lighter_CheckConnectionServer) error {
+func (s *lighterServer) OpenStream(request *LighterGRPC.Request, stream LighterGRPC.Lighter_OpenStreamServer) error {
 	if configuration.DioderConfiguration.Debug {
-		logging.LogChan <- fmt.Sprint("CheckConnection", request)
+		logging.LogChan <- fmt.Sprint("OpenStream", request)
 	}
 
 	if !checkAccess(request) {
@@ -68,14 +68,21 @@ func (s *lighterServer) CheckConnection(request *LighterGRPC.Request, stream Lig
 	colorSet := configuration.DioderConfiguration.DioderInstance.GetCurrentColor()
 
 	if configuration.DioderConfiguration.Debug {
-		logging.LogChan <- fmt.Sprint("CheckConnection: Returning the current settings:", colorSet)
+		logging.LogChan <- fmt.Sprint("OpenStream: Returning the current settings:", colorSet)
 		logging.LogChan <- "Saving the stream-connection"
 	}
 
 	streams[request.DeviceID] = stream
 
-	//@ToDo: Do not use unkeyed fields!
-	error := stream.Send(&LighterGRPC.ColorMessage{onState, int32(colorSet.R), int32(colorSet.G), int32(colorSet.B), int32(colorSet.A), "Dioder-Server", ""})
+	error := stream.Send(&LighterGRPC.ColorMessage{
+		Onstate: onState,
+		R: int32(colorSet.R),
+		G: int32(colorSet.G),
+		B: int32(colorSet.B),
+		Opacity: int32(colorSet.A),
+		DeviceID: "Dioder-Server",
+	})
+
 	if error != nil && configuration.DioderConfiguration.Debug {
 		logging.LogChan <- error
 	}
@@ -88,6 +95,25 @@ func (s *lighterServer) CheckConnection(request *LighterGRPC.Request, stream Lig
 	}
 
 	return error
+}
+
+func (s *lighterServer) GetStatus(ctx context.Context, request *LighterGRPC.Request) (*LighterGRPC.ColorMessage, error) {
+	if configuration.DioderConfiguration.Debug {
+		logging.LogChan <- fmt.Sprint("GetStatus", request)
+	}
+
+	if !checkAccess(request) {
+		return nil, errNotAuthorized
+	}
+
+	colorSet := configuration.DioderConfiguration.DioderInstance.GetCurrentColor()
+	return &LighterGRPC.ColorMessage{
+		Onstate: onState,
+		R: int32(colorSet.R),
+		G: int32(colorSet.G),
+		B: int32(colorSet.B),
+		Opacity: int32(colorSet.A),
+	}, nil
 }
 
 func (s *lighterServer) LoadServerLog(logRequest *LighterGRPC.LogRequest, server LighterGRPC.Lighter_LoadServerLogServer) error {
