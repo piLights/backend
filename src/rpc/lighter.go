@@ -117,6 +117,10 @@ func (s *lighterServer) GetStatus(ctx context.Context, request *LighterGRPC.Requ
 }
 
 func (s *lighterServer) LoadServerLog(logRequest *LighterGRPC.LogRequest, server LighterGRPC.Lighter_LoadServerLogServer) error {
+	if !checkAccess(server) {
+		return errNotAuthorized
+	}
+
 	for _, logEntry := range logging.GetLogEntryList(logRequest.Amount) {
 		error := server.Send(logEntry)
 		if error != nil {
@@ -137,10 +141,7 @@ func (s *lighterServer) SwitchState(ctx context.Context, stateMessage *LighterGR
 		logging.LogChan <- fmt.Sprintln("SwitchState", stateMessage)
 	}
 
-	if configuration.DioderConfiguration.Password != "" && configuration.DioderConfiguration.Password != stateMessage.Password {
-		if configuration.DioderConfiguration.Debug {
-			logging.LogChan <- "Not authorized"
-		}
+	if !checkAccess(stateMessage) {
 		return nil, errNotAuthorized
 	}
 
