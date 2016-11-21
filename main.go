@@ -8,10 +8,10 @@ import (
 	"os/signal"
 
 	"gitlab.com/piLights/dioder"
-	"gitlab.com/piLights/dioder-rpc/src/configuration"
-	"gitlab.com/piLights/dioder-rpc/src/logging"
-	"gitlab.com/piLights/dioder-rpc/src/piLightsVersion"
-	"gitlab.com/piLights/dioder-rpc/src/rpc"
+	"gitlab.com/piLights/dioder-rpc/configuration"
+	"gitlab.com/piLights/dioder-rpc/logging"
+	"gitlab.com/piLights/dioder-rpc/piLightsVersion"
+	"gitlab.com/piLights/dioder-rpc/rpc"
 
 	"github.com/urfave/cli"
 )

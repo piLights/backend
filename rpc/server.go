@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"net"
 
-	"gitlab.com/piLights/dioder-rpc/src/configuration"
-	"gitlab.com/piLights/dioder-rpc/src/logging"
+	"gitlab.com/piLights/dioder-rpc/configuration"
+	"gitlab.com/piLights/dioder-rpc/logging"
 	"gitlab.com/piLights/proto"
 
 	"google.golang.org/grpc"

@@ -21,7 +21,7 @@ before_install:
   - cd $HOME/gopath/src/github.com/piLights/dioder-rpc
 
 install:
-    - cd src/; go get; cd ..
+    - go get
 
 script:
   - ./buildscript.sh

@@ -3,7 +3,7 @@ package rpc
 import (
 	"golang.org/x/net/context"
 
-	"gitlab.com/piLights/dioder-rpc/src/piLightsVersion"
+	"gitlab.com/piLights/dioder-rpc/piLightsVersion"
 	"gitlab.com/piLights/proto"
 )
 

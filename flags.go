@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/urfave/cli"
-	"gitlab.com/piLights/dioder-rpc/src/configuration"
+	"gitlab.com/piLights/dioder-rpc/configuration"
 )
 
 var applicationFlags = []cli.Flag{

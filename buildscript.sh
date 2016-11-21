@@ -4,12 +4,10 @@ if [ ! -d "/tmp/CIgo" ]; then
   mkdir /tmp/CIgo
 fi
 
-cd src/
 
 # Get all dependencies
 go get
 
-cd ..
 mkdir builds
 
 # Replace the version-string
@@ -22,5 +20,5 @@ if [ ! -z ${TRAVIS_COMMIT+x} ]; then
     find . -type f -name "*.go" | xargs sed -i -e "s/debugVersion/$TRAVIS_COMMIT/g"
 fi
 
-go build -o builds/dioderAPI_x86 -v src/*.go
-env GOOS=linux GOARCH=arm go build -o builds/dioderAPI_arm -v src/*.go
+go build -o builds/dioderAPI_x86 -v *.go
+env GOOS=linux GOARCH=arm go build -o builds/dioderAPI_arm -v *.go

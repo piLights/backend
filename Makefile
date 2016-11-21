@@ -3,13 +3,10 @@
 GOFLAGS ?= $(GOFLAGS:)
 
 build:
-	@go build $(GOFLAGS) -o builds/dioderAPI src/*.go
+	@go build $(GOFLAGS) -o builds/dioderAPI *.go
 
 clean:
 	@go clean
 
-proto:
-	@protoc --go_out=plugins=grpc:. src/proto/*.proto
-
 run:
-	@go run src/*.go
+	@go run *.go

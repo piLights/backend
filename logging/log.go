@@ -8,7 +8,7 @@ import (
 	"sync"
 	"time"
 
-	"gitlab.com/piLights/dioder-rpc/src/configuration"
+	"gitlab.com/piLights/dioder-rpc/configuration"
 	"gitlab.com/piLights/proto"
 )
 
