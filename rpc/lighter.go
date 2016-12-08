@@ -10,6 +10,7 @@ import (
 	"gitlab.com/piLights/proto"
 
 	"golang.org/x/net/context"
+	"google.golang.org/grpc/metadata"
 )
 
 //server implements the server-interface required by GRPC
@@ -78,7 +79,18 @@ func (s *lighterServer) OpenStream(request *LighterGRPC.Request, stream LighterG
 		logging.LogChan <- "Saving the stream-connection"
 	}
 
-	streams[request.DeviceID] = stream
+	metadata, ok := metadata.FromContext(stream.Context())
+	if !ok {
+		logging.LogChan <- "OpenStream: Unable to get request metadata"
+	} else {
+		deviceID := metadata["DeviceID"]
+
+		if deviceID != "" {
+			logging.LogChan <- "OpenStream: Client did not send his deviceID. Unable to save the stream"
+		} else {
+			streams[metadata["DeviceID"]] = stream
+		}
+	}
 
 	error := stream.Send(&LighterGRPC.ColorMessage{
 		Onstate: onState,
