@@ -8,6 +8,7 @@ import (
 	"gitlab.com/piLights/dioder-rpc/configuration"
 	"gitlab.com/piLights/dioder-rpc/logging"
 	"gitlab.com/piLights/proto"
+
 	"golang.org/x/net/context"
 )
 
@@ -16,14 +17,14 @@ type lighterServer struct{}
 
 var (
 	//Holds all streams
-	streams map[string]LighterGRPC.Lighter_OpenStreamServer
+	streams map[string]LighterGRPC.RgbService_OpenStreamServer
 
 	onState bool
 
 	colorStream chan *LighterGRPC.ColorMessage
 
 	//Errors
-	errNotAuthorized  = errors.New("Not authorized")
+	errNotAuthorized = errors.New("Not authorized")
 	errNotImplemented = errors.New("Not implemented")
 )
 
@@ -46,7 +47,7 @@ func (s *lighterServer) SetColor(ctx context.Context, colorMessage *LighterGRPC.
 		R: red,
 		G: green,
 		B: blue,
-		A:opacity,
+		A: opacity,
 	}
 
 	configuration.DioderConfiguration.DioderInstance.SetAll(colorSet)
@@ -61,7 +62,7 @@ func (s *lighterServer) SetColor(ctx context.Context, colorMessage *LighterGRPC.
 	return &LighterGRPC.Confirmation{Success: true}, nil
 }
 
-func (s *lighterServer) OpenStream(request *LighterGRPC.Request, stream LighterGRPC.Lighter_OpenStreamServer) error {
+func (s *lighterServer) OpenStream(request *LighterGRPC.Request, stream LighterGRPC.RgbService_OpenStreamServer) error {
 	if configuration.DioderConfiguration.Debug {
 		logging.LogChan <- fmt.Sprint("OpenStream", request)
 	}
@@ -81,11 +82,10 @@ func (s *lighterServer) OpenStream(request *LighterGRPC.Request, stream LighterG
 
 	error := stream.Send(&LighterGRPC.ColorMessage{
 		Onstate: onState,
-		R: int32(colorSet.R),
-		G: int32(colorSet.G),
-		B: int32(colorSet.B),
+		R:       int32(colorSet.R),
+		G:       int32(colorSet.G),
+		B:       int32(colorSet.B),
 		Opacity: int32(colorSet.A),
-		DeviceID: "Dioder-Server",
 	})
 
 	if error != nil && configuration.DioderConfiguration.Debug {
@@ -114,14 +114,14 @@ func (s *lighterServer) GetStatus(ctx context.Context, request *LighterGRPC.Requ
 	colorSet := configuration.DioderConfiguration.DioderInstance.GetCurrentColor()
 	return &LighterGRPC.ColorMessage{
 		Onstate: onState,
-		R: int32(colorSet.R),
-		G: int32(colorSet.G),
-		B: int32(colorSet.B),
+		R:       int32(colorSet.R),
+		G:       int32(colorSet.G),
+		B:       int32(colorSet.B),
 		Opacity: int32(colorSet.A),
 	}, nil
 }
 
-func (s *lighterServer) LoadServerLog(logRequest *LighterGRPC.LogRequest, server LighterGRPC.Lighter_LoadServerLogServer) error {
+func (s *lighterServer) LoadServerLog(logRequest *LighterGRPC.LogRequest, server LighterGRPC.RgbService_LoadServerLogServer) error {
 	if !checkAccess(server) {
 		return errNotAuthorized
 	}

@@ -18,7 +18,7 @@ func StartServer() {
 	}
 
 	//Initialize the streams-map
-	streams = make(map[string]LighterGRPC.Lighter_OpenStreamServer)
+	streams = make(map[string]LighterGRPC.RgbService_OpenStreamServer)
 	colorStream = make(chan *LighterGRPC.ColorMessage)
 
 	protocol := "tcp"
@@ -46,7 +46,7 @@ func StartServer() {
 
 	grpcServer := grpc.NewServer()
 
-	LighterGRPC.RegisterLighterServer(grpcServer, &lighterServer{})
+	LighterGRPC.RegisterRgbServiceServer(grpcServer, &lighterServer{})
 	LighterGRPC.RegisterSystemServer(grpcServer, &systemServer{})
 
 	fmt.Printf("Listening on %s...\n", configuration.DioderConfiguration.BindTo)

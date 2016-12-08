@@ -1,4 +1,4 @@
-.PHONY: all test clean build install
+.PHONY: build clean run fmt
 
 GOFLAGS ?= $(GOFLAGS:)
 
