@@ -79,17 +79,18 @@ func (s *lighterServer) OpenStream(request *LighterGRPC.Request, stream LighterG
 		logging.LogChan <- "Saving the stream-connection"
 	}
 
-	metadata, ok := metadata.FromContext(stream.Context())
+	md, ok := metadata.FromContext(stream.Context())
 	if !ok {
 		logging.LogChan <- "OpenStream: Unable to get request metadata"
 	} else {
-		deviceID := metadata["DeviceID"]
+		deviceID := md["DeviceID"]
 
-		if deviceID != "" {
+		logging.LogChan <- fmt.Sprintf("DeviceID map: %v", deviceID)
+		/*if deviceID != "" {
 			logging.LogChan <- "OpenStream: Client did not send his deviceID. Unable to save the stream"
 		} else {
-			streams[metadata["DeviceID"]] = stream
-		}
+			streams[md["DeviceID"]] = stream
+		}*/
 	}
 
 	error := stream.Send(&LighterGRPC.ColorMessage{
