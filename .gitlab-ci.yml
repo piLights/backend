@@ -21,5 +21,23 @@ after_script:
 
 Build:
     <<: *compileAndUpload
+    stage: build
     variables:
         OPERATING_SYSTEM: "linux"
+
+uploadBinaries:
+  stage: deploy
+  only:
+    - master
+  dependencies:
+    - Build
+  script:
+    - mkdir .public
+    - cp -r dist/* .public
+    - mv .public public
+  artifacts:
+    paths:
+      - public
+  only:
+    - master
+
