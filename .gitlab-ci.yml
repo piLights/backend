@@ -25,7 +25,7 @@ Build:
     variables:
         OPERATING_SYSTEM: "linux"
 
-uploadBinaries:
+pages:
   stage: deploy
   only:
     - master
