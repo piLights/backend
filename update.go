@@ -14,7 +14,7 @@ import (
 )
 
 //UPDATEURL is the URL from which the updates for the OS and architecture are fetched from
-const UPDATEURL = "https://github.com/piLights/dioder-rpc/releases/download/pre-release/dioderAPI_" + runtime.GOOS + "_" + runtime.GOARCH
+const UPDATEURL = "https://pilights.gitlab.io/dioder-rpc/dioderAPI_" + runtime.GOOS + "_" + runtime.GOARCH
 
 var errFileNoFound = errors.New("File not found")
 
@@ -63,7 +63,7 @@ func updateBinary(url string) error {
 	}
 
 	error = update.Apply(response.Body, update.Options{
-	//Checksum: checksum,
+		//Checksum: checksum,
 	})
 	if error != nil {
 		rollbackError := update.RollbackError(error)
