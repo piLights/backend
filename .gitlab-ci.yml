@@ -35,6 +35,8 @@ uploadBinaries:
     - mkdir .public
     - cp -r dist/* .public
     - mv .public public
+    - echo "Hello World!" > public/index.html
+    - ls -lsa public
   artifacts:
     paths:
       - public
